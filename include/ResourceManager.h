@@ -14,6 +14,7 @@ class ResourceManager
 public:
     ResourceManager(const char* file_name);
     const sf::Texture& getTexture(std::string texture_name);
+    operator bool();
 
 private:
     bool valid;
@@ -22,7 +23,6 @@ private:
         Texture();
         Texture(const std::string& file_name);
         bool load();
-        operator bool();
         std::string file_name;
         bool loaded = false;
         sf::Texture texture;   

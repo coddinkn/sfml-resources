@@ -1,9 +1,9 @@
 #include <iostream>
+#include "ResourceManager.h"
 
 int main(){
 
-    std::cout << "ANAL" << std::endl;
-
+    ResourceManager rm("textures");
     return 0;
 
 }
