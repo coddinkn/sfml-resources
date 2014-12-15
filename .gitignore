@@ -1,0 +1,7 @@
+build/**
+SFML\ Resource\ Manager
+.sconsign.dblite
+**/*.swp
+**/*.swo
+docs/**
+**/*.exe
