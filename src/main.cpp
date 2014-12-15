@@ -1,14 +1,16 @@
 #include <SFML/Graphics.hpp>
 #include "ResourceManager.h"
+#include "CenteredSprite.h"
 
 int main()
 {
 
-    sf::Sprite testSprite;
     ResourceManager rm("textures");
+    CenteredSprite testSprite("test", rm);
 
-    testSprite.setTexture(rm.getTexture("test"));
     testSprite.setPosition(100, 100);
+
+    testSprite.setScale(10, 10);
 
 	sf::RenderWindow window(sf::VideoMode(640, 480), "SFML Resource Manager");
 	window.setFramerateLimit(60);
@@ -24,7 +26,13 @@ int main()
             {
                 window.close();
             }
-		}
+		
+            if(event.type == sf::Event::KeyPressed){
+
+                testSprite.rotate(45);
+            }
+        
+        }
 
 		window.clear();
         window.draw(testSprite);
