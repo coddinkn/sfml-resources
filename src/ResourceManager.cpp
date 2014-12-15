@@ -20,13 +20,20 @@ ResourceManager::ResourceManager(const char* file_name)
         
     }
     
+    std::stringstream format;
     std::string line;
+    std::string name;
+    std::string file_path;
 
     while (std::getline(in, line))
     {
-        
-            
-        
+     
+        format.str(line);
+                 
+        format >> name;
+        format >> file_path;
+                             
+        textures[name] = Texture(file_path);
         
     }
     
