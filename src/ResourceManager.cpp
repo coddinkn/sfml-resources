@@ -4,7 +4,7 @@ ResourceManager::ResourceManager(const char* file_name)
 {
     
     sf::Image null_image;
-    null_image.create(1, 1, sf::Color(0xFF, 0x00, 0xFF));
+    null_image.create(64, 64, sf::Color(0xFF, 0x00, 0xFF));
     textures["NULL_TEXTURE"] = Texture("null_file");
     textures["NULL_TEXTURE"].texture.loadFromImage(null_image);
 
@@ -62,5 +62,12 @@ bool ResourceManager::Texture::load()
 
 const sf::Texture& ResourceManager::getTexture(std::string texture_name)
 {
+    if (!textures[texture_name].loaded)
+    {
+        if (!textures[texture_name].load())
+        { 
+            return textures["NULL_TEXTURE"].texture;
+        }
+    }
     return textures[texture_name].texture;
 }
