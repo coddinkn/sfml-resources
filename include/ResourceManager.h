@@ -1,12 +1,9 @@
 #ifndef RESOURCE_MANAGER_H
 #define RESOURCE_MANAGER_H
 
-#include <SFML/Graphics.hpp>
-#include <iostream>
-#include <sstream>
-#include <fstream>
 #include <string>
 #include <map>
+#include <SFML/Graphics.hpp>
 
 class ResourceManager
 {

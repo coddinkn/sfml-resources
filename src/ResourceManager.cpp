@@ -1,4 +1,6 @@
 #include "ResourceManager.h"
+#include <fstream>
+#include <sstream>
 
 ResourceManager::ResourceManager(const char* file_name)
 {
@@ -20,11 +22,7 @@ ResourceManager::ResourceManager(const char* file_name)
     
     if (!in)
     {        
-        std::cout << "Error opening " << file_name << " to populate texutres." << std::endl;
-        std::cout << "Resource manager invalidated." << std::endl;               
-        
         valid = false;         
-        
         return;   
     }
     
