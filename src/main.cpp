@@ -1,3 +1,4 @@
+#include <iostream>
 #include <SFML/Graphics.hpp>
 #include "ResourceManager.h"
 #include "CenteredSprite.h"
@@ -5,7 +6,15 @@
 int main()
 {
 
-    ResourceManager rm("textures");
+    ResourceManager rm("textures", "animations");
+    
+    if (!rm)
+    {
+        std::cout << "Resource Manager: Error opening files." << std::endl;
+        return -1;
+    }
+
+
     CenteredSprite testSprite("test", rm);
 
     testSprite.setPosition(100, 100);
