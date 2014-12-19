@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "ResourceManager.h"
 #include "CenteredSprite.h"
+#include "AnimatedSprite.h"
 
 int main()
 {
@@ -14,7 +15,7 @@ int main()
         return -1;
     }
 
-
+//    AnimatedSprite testAnimatedSprite("test1", rm, "test", 500);
     CenteredSprite testSprite("test", rm);
 
     testSprite.setPosition(100, 100);

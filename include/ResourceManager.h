@@ -27,9 +27,10 @@ private:
     struct Animations
     {
         Animations();
+        ~Animations();
         bool dimensioned = false;
-        bool addAnimation(const std::string& animation_name, int x, int y, char direction, int frames);
-        bool addFrame(const std::string& animation_name, int x, int y);
+        void setDimensions(int width, int height);
+        void addAnimation(const std::string& animation_name, int x, int y, char direction, int frames);
         int width;
         int height;
         std::string file_name;

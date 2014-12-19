@@ -17,7 +17,6 @@ public:
     void pause();
     bool isPaused();
     void changeFrameTime(int frameTime);
-    ~AnimatedSprite();
 private:        
     std::map<std::string, sf::IntRect*> animations;
     std::string currentAnimation;

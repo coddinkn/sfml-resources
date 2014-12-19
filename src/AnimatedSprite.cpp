@@ -26,11 +26,3 @@ void AnimatedSprite::changeFrameTime(int frameTime)
 {
     this->frameTime = frameTime;
 }
-
-AnimatedSprite::~AnimatedSprite()
-{
-    for (auto itr = animations.begin(); itr != animations.end(); itr++)
-    {
-        delete [] itr->second;
-    }
-}
