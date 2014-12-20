@@ -155,26 +155,23 @@ void ResourceManager::Animations::setDimensions(int width, int height)
     dimensioned = true;
 }
 
-void ResourceManager::Animations::addAnimation(const std::string& name, int x, int y, char direction, int frames)
+void ResourceManager::Animations::addAnimation(const std::string& name, int x, int y, bool isVertical, int frames)
 {
     animations[name] = new sf::IntRect[frames];
+
     for (int i = 0; i < frames; i++)
     {
         animations[name][i].width = width;
         animations[name][i].height = height;
-        if (direction == 'h')
-        {
-            animations[name][i].left = x + (i * width);
-            animations[name][i].top = y;
-        }
-        else if (direction == 'v')
+
+        if (isVertical)
         {
             animations[name][i].left = x;
             animations[name][i].top = y + (i * height);
         }
         else
         {
-            animations[name][i].left = x;
+            animations[name][i].left = x + (i * width);
             animations[name][i].top = y;
         }
     }

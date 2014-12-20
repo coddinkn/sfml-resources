@@ -32,7 +32,8 @@ private:
         ~Animations();
         bool dimensioned = false;
         void setDimensions(int width, int height);
-        void addAnimation(const std::string& animation_name, int x, int y, char direction, int frames);
+        void addAnimation(const std::string& animation_name, int x, int y,
+                          bool isVertical, int frames);
         int width;
         int height;
         std::string file_name;
