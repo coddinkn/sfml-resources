@@ -4,19 +4,19 @@
 
 ResourceManager::ResourceManager(const char* texture_file_name, const char* animations_file_name)
 {
-    
-    sf::Image null_image;
-    null_image.create(64, 64, sf::Color(0xFF, 0x00, 0xFF));
-    textures["NULL_TEXTURE"] = Texture();
-    textures["NULL_TEXTURE"].texture.loadFromImage(null_image);
+    // Default Texture to be used when non-existant ones are requested
+    sf::Image defaultImage;
+    defaultImage.create(64, 64, sf::Color(0xFF, 0x00, 0xFF));
+    defaultTexture.texture.loadFromImage(defaultImage);
+    defaultTexture.loaded = true;    
 
-    sf::IntRect* null_animation = new sf::IntRect[1];
-    null_animation[0] = sf::IntRect(0, 0, 64, 64);
-    collectionOfAnimations["NULL_ANIMATIONS"] = Animations();
-    collectionOfAnimations["NULL_ANIMATIONS"].width = 64;
-    collectionOfAnimations["NULL_ANIMATIONS"].height = 64;
-    collectionOfAnimations["NULL_ANIMATIONS"].dimensioned = true;
-    collectionOfAnimations["NULL_ANIMATIONS"].animations["null_animation"] = null_animation; 
+    // Default Animations to be used when non-existant ones are requested
+    sf::IntRect* defaultFrames = new sf::IntRect[1];
+    defaultFrames[0] = sf::IntRect(0, 0, 64, 64);
+    defaultAnimations.width = 64;
+    defaultAnimations.height = 64;
+    defaultAnimations.dimensioned = true;
+    defaultAnimations.animations["null_animation"] = defaultFrames;
     
     std::stringstream format;
     std::string line;
@@ -106,7 +106,7 @@ ResourceManager::operator bool()
 
 ResourceManager::Texture::Texture()
 {
-    file_name = "res/null_file";
+
 }
 
 ResourceManager::Texture::Texture(const std::string& file_name)
@@ -125,7 +125,7 @@ const sf::Texture& ResourceManager::getTexture(const std::string& name)
     {
         if (!textures[name].load())
         { 
-            return textures["NULL_TEXTURE"].texture;
+            return defaultTexture.texture;
         }
     }
     return textures[name].texture;
@@ -171,7 +171,7 @@ const std::map<std::string, sf::IntRect*>& ResourceManager::getAnimations(const 
     if (collectionOfAnimations.find(name) != collectionOfAnimations.end())
         return collectionOfAnimations[name].animations;
     else
-        return collectionOfAnimations["NULL_ANIMATIONS"].animations;
+        return defaultAnimations.animations;
 }
 
 ResourceManager::Animations::~Animations()

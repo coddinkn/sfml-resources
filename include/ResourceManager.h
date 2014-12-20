@@ -38,6 +38,10 @@ private:
     };
     std::map<std::string, Texture> textures;
     std::map<std::string, Animations> collectionOfAnimations;
+    
+    // Default values for non-existant Textures and Animations
+    Texture defaultTexture;
+    Animations defaultAnimations;
 };
 
 #endif
