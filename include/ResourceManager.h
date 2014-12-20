@@ -8,12 +8,14 @@
 class ResourceManager
 {
 public:
-    ResourceManager(const char* texture_file_name, const char* animations_file_name);
+    ResourceManager(const char* textureFilePath, const char* animationsFilePath);
     const sf::Texture& getTexture(const std::string& name);
     const std::map<std::string, sf::IntRect*>& getAnimations(const std::string& name);
     operator bool();
 
 private:
+    std::string getParentDirectory(const std::string& filePath);
+
     bool valid;
     struct Texture
     {

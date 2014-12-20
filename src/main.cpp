@@ -7,7 +7,7 @@
 int main()
 {
 
-    ResourceManager rm("textures", "animations");
+    ResourceManager rm("res/textures", "res/animations");
     
     if (!rm)
     {

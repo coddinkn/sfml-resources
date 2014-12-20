@@ -2,7 +2,7 @@
 #include <fstream>
 #include <sstream>
 
-ResourceManager::ResourceManager(const char* texture_file_name, const char* animations_file_name)
+ResourceManager::ResourceManager(const char* textureFilePath, const char* animationsFilePath)
 {
     // Default Texture to be used when non-existant ones are requested
     sf::Image defaultImage;
@@ -21,7 +21,6 @@ ResourceManager::ResourceManager(const char* texture_file_name, const char* anim
     std::stringstream format;
     std::string line;
     std::string name;
-    std::string file_path;
     std::string parameter;
 
     char direction;
@@ -31,10 +30,10 @@ ResourceManager::ResourceManager(const char* texture_file_name, const char* anim
     int y;
     int frames;
 
-    file_path = "res/";
-    file_path += texture_file_name;
+    // Load the texture list from disk
 
-    std::ifstream in(file_path.c_str());    
+    std::string textureParentDir = getParentDirectory(textureFilePath);
+    std::ifstream in(textureFilePath);    
     
     if (!in)
     {        
@@ -42,21 +41,22 @@ ResourceManager::ResourceManager(const char* texture_file_name, const char* anim
         return;   
     }
     
+    std::string file_path;
+
     while (std::getline(in, line))
     {
         format.str(line);
         format >> name;
         format >> file_path;                     
-        textures[name] = Texture(file_path);   
+        textures[name] = Texture(textureParentDir + file_path);   
         format.clear();
     }
 
     in.close();
 
-    file_path = "res/";
-    file_path += animations_file_name;
+    // Load the animations list from disk
 
-    in.open(file_path.c_str());
+    in.open(animationsFilePath);
 
     if (!in)
     {
@@ -104,6 +104,19 @@ ResourceManager::operator bool()
     return valid;
 }
 
+/// Returns a string representing the parent directory of a given file path.
+/// The last file separator is retained. If the given path has no parent, an
+/// empty string is returned.
+std::string ResourceManager::getParentDirectory(const std::string& filePath)
+{
+    size_t lastSeparator = filePath.find_last_of('/');
+
+    if (lastSeparator == std::string::npos)
+        return "";
+    else
+        return filePath.substr(0, lastSeparator + 1);
+}
+
 ResourceManager::Texture::Texture()
 {
 
@@ -111,7 +124,7 @@ ResourceManager::Texture::Texture()
 
 ResourceManager::Texture::Texture(const std::string& file_name)
 {
-    this->file_name = "res/" + file_name;   
+    this->file_name = file_name;   
 }
 
 bool ResourceManager::Texture::load()
@@ -145,7 +158,8 @@ void ResourceManager::Animations::setDimensions(int width, int height)
 void ResourceManager::Animations::addAnimation(const std::string& name, int x, int y, char direction, int frames)
 {
     animations[name] = new sf::IntRect[frames];
-    for (int i = 0; i < frames; i++){
+    for (int i = 0; i < frames; i++)
+    {
         animations[name][i].width = width;
         animations[name][i].height = height;
         if (direction == 'h')
