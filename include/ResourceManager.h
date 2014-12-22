@@ -2,6 +2,7 @@
 #define RESOURCE_MANAGER_H
 
 #include <string>
+#include <vector>
 #include <map>
 #include <SFML/Graphics.hpp>
 
@@ -10,7 +11,7 @@ class ResourceManager
 public:
     ResourceManager(const char* textureFilePath, const char* animationsFilePath);
     const sf::Texture& getTexture(const std::string& name);
-    const std::map<std::string, sf::IntRect*>& getAnimations(const std::string& name);
+    const std::map<std::string, std::vector<sf::IntRect>>& getAnimations(const std::string& name);
     operator bool();
 
 private:
@@ -37,7 +38,7 @@ private:
         int width;
         int height;
         std::string file_name;
-        std::map<std::string, sf::IntRect*> animations; 
+        std::map<std::string, std::vector<sf::IntRect>> animations; 
     };
     std::map<std::string, Texture> textures;
     std::map<std::string, Animations> collectionOfAnimations;

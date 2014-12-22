@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 #include <SFML/Graphics.hpp>
 #include "ResourceManager.h"
 
@@ -18,7 +19,7 @@ public:
     bool isPaused();
     void changeFrameTime(int frameTime);
 private:        
-    std::map<std::string, sf::IntRect*> animations;
+    std::map<std::string, std::vector<sf::IntRect>> animations;
     std::string currentAnimation;
     int currentFrame = 0;
     int frameTime;   

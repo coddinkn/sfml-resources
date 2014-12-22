@@ -1,4 +1,5 @@
 #include <iostream>
+#include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include "ResourceManager.h"
 #include "CenteredSprite.h"
@@ -6,6 +7,8 @@
 
 int main()
 {
+
+    sf::Clock time;
 
     ResourceManager rm("res/textures", "res/animations");
     
@@ -15,7 +18,7 @@ int main()
         return -1;
     }
 
-    AnimatedSprite testAnimatedSprite("testone", rm, "test", 500);
+    AnimatedSprite testAnimatedSprite("testone", rm, "test", 1000);
     CenteredSprite testSprite("test", rm);
 
     testSprite.setPosition(100, 100);
@@ -23,6 +26,8 @@ int main()
 
 	sf::RenderWindow window(sf::VideoMode(640, 480), "SFML Resource Manager");
 	window.setFramerateLimit(60);
+
+    time.restart();
 
 	while ( window.isOpen() )
 	{
@@ -42,6 +47,9 @@ int main()
             }
         
         }
+
+        testAnimatedSprite.tick(time.getElapsedTime().asMilliseconds());
+        time.restart();
 
 		window.clear();
         window.draw(testAnimatedSprite);

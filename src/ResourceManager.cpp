@@ -1,5 +1,4 @@
 #include "ResourceManager.h"
-#include <iostream>
 #include <fstream>
 #include <sstream>
 
@@ -12,12 +11,10 @@ ResourceManager::ResourceManager(const char* textureFilePath, const char* animat
     defaultTexture.loaded = true;    
 
     // Default Animations to be used when non-existant ones are requested
-    sf::IntRect* defaultFrames = new sf::IntRect[1];
-    defaultFrames[0] = sf::IntRect(0, 0, 64, 64);
     defaultAnimations.width = 64;
     defaultAnimations.height = 64;
     defaultAnimations.dimensioned = true;
-    defaultAnimations.animations["null_animation"] = defaultFrames;
+    defaultAnimations.animations["null_animation"].push_back(sf::IntRect(0, 0, 64, 64));
     
     std::stringstream format;
     std::string line;
@@ -158,10 +155,10 @@ void ResourceManager::Animations::setDimensions(int width, int height)
 
 void ResourceManager::Animations::addAnimation(const std::string& name, int x, int y, bool isVertical, int frames)
 {
-    animations[name] = new sf::IntRect[frames];
-
     for (int i = 0; i < frames; i++)
     {
+        animations[name].push_back(sf::IntRect());
+
         animations[name][i].width = width;
         animations[name][i].height = height;
 
@@ -178,7 +175,7 @@ void ResourceManager::Animations::addAnimation(const std::string& name, int x, i
     }
 }
 
-const std::map<std::string, sf::IntRect*>& ResourceManager::getAnimations(const std::string& name)
+const std::map<std::string, std::vector<sf::IntRect>>& ResourceManager::getAnimations(const std::string& name)
 {
     if (collectionOfAnimations.find(name) != collectionOfAnimations.end())
         return collectionOfAnimations[name].animations;
@@ -188,9 +185,5 @@ const std::map<std::string, sf::IntRect*>& ResourceManager::getAnimations(const 
 
 ResourceManager::Animations::~Animations()
 {
-    for (auto itr = animations.begin(); itr != animations.end(); itr++)
-    {
-        delete [] itr->second; 
-    }
 }
 
