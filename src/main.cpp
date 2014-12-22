@@ -2,8 +2,7 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include "ResourceManager.h"
-#include "CenteredSprite.h"
-#include "AnimatedSprite.h"
+#include "CenAnimSprite.h"
 
 int main()
 {
@@ -18,11 +17,9 @@ int main()
         return -1;
     }
 
-    AnimatedSprite testAnimatedSprite("testone", rm, "test", 1000);
-    CenteredSprite testSprite("test", rm);
-
-    testSprite.setPosition(100, 100);
-    testSprite.setScale(10, 10);
+    CenAnimSprite test("testone", rm, "test", 1000);
+    
+    test.setPosition(100, 100);
 
 	sf::RenderWindow window(sf::VideoMode(640, 480), "SFML Resource Manager");
 	window.setFramerateLimit(60);
@@ -43,17 +40,16 @@ int main()
 		
             if(event.type == sf::Event::KeyPressed){
 
-                testSprite.rotate(45);
+                test.rotate(45);
             }
         
         }
 
-        testAnimatedSprite.tick(time.getElapsedTime().asMilliseconds());
+        test.tick(time.getElapsedTime().asMilliseconds());
         time.restart();
 
 		window.clear();
-        window.draw(testAnimatedSprite);
-        window.draw(testSprite);
+        window.draw(test);
         window.display();
 
 	}
