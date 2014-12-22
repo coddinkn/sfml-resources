@@ -1,4 +1,5 @@
 #include "ResourceManager.h"
+#include <iostream>
 #include <fstream>
 #include <sstream>
 
@@ -90,7 +91,7 @@ ResourceManager::ResourceManager(const char* textureFilePath, const char* animat
             format >> frames;
             if (collectionOfAnimations[name].dimensioned)
             {
-                collectionOfAnimations[name].addAnimation(parameter, x, y, direction, frames);
+                collectionOfAnimations[name].addAnimation(parameter, x, y, (direction == 'v'), frames);
             }
         }
         format.clear();

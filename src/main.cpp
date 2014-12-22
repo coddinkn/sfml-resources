@@ -15,11 +15,10 @@ int main()
         return -1;
     }
 
-//    AnimatedSprite testAnimatedSprite("test1", rm, "test", 500);
+    AnimatedSprite testAnimatedSprite("testone", rm, "test", 500);
     CenteredSprite testSprite("test", rm);
 
     testSprite.setPosition(100, 100);
-
     testSprite.setScale(10, 10);
 
 	sf::RenderWindow window(sf::VideoMode(640, 480), "SFML Resource Manager");
@@ -45,6 +44,7 @@ int main()
         }
 
 		window.clear();
+        window.draw(testAnimatedSprite);
         window.draw(testSprite);
         window.display();
 

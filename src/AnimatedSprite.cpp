@@ -1,10 +1,13 @@
 #include "AnimatedSprite.h"
+#include <algorithm>
 #include <sstream>
 #include <fstream>
 
 AnimatedSprite::AnimatedSprite(const std::string& name, ResourceManager& rm, const std::string& firstAnimation, int frameTime) :
-currentAnimation(firstAnimation), animations(rm.getAnimations(name)), sf::Sprite(rm.getTexture(name), animations[currentAnimation][currentFrame]), frameTime(frameTime) 
+currentAnimation(firstAnimation), sf::Sprite(rm.getTexture(name)), frameTime(frameTime) 
 {
+    animations = rm.getAnimations(name);
+    setTextureRect(animations[currentAnimation][currentFrame]);
 }
 
 void AnimatedSprite::play()
@@ -20,6 +23,12 @@ void AnimatedSprite::pause()
 bool AnimatedSprite::isPaused()
 {
     return paused;
+}
+
+void AnimatedSprite::tick(int deltaTime)
+{
+
+
 }
 
 void AnimatedSprite::changeFrameTime(int frameTime)
