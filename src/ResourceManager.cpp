@@ -70,6 +70,7 @@ ResourceManager::ResourceManager(const char* textureFilePath, const char* animat
         if (collectionOfAnimations.find(name) == collectionOfAnimations.end())
         {
             collectionOfAnimations[name] = Animations();
+            collectionOfAnimations[name].animations["null_animation"] = defaultAnimations.animations["null_animation"];
         }
         
         format >> parameter; 

@@ -16,7 +16,7 @@ int main()
         return -1;
     }
 
-    AnimatedSprite test(manager, "testone", "test", 1000);
+    AnimatedSprite test(manager, "testone", "test", 1000, true);
     
     test.setPosition(100, 100);
 

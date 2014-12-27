@@ -7,11 +7,10 @@ AnimatedSprite::AnimatedSprite(ResourceManager& manager,
                                const std::string& firstAnimation,
                                int frameTime, bool isCentered) :
     ManagedSprite(manager, name, isCentered),
-    currentAnimation(firstAnimation),
-    animations(manager.getAnimations(name)),
-    frameTime(frameTime) 
+    animations(manager.getAnimations(name))
 {
-    setTextureRect(animations[currentAnimation][currentFrame]);
+    changeAnimation(firstAnimation, frameTime);    
+    
     if(isCentered)
         setOrigin(float(getTextureRect().width / 2.0),
         float(getTextureRect().height / 2.0));
@@ -35,30 +34,17 @@ bool AnimatedSprite::isPaused()
 void AnimatedSprite::changeAnimation(const std::string& name)
 {
     if (animations.find(name) != animations.end())
-    { 
         currentAnimation = name;
-    }
     else
-    {
-        pause();
-    }
+        currentAnimation = "null_animation";
     currentFrame = 0;
     setTextureRect(animations[currentAnimation][currentFrame]);
 }
 
 void AnimatedSprite::changeAnimation(const std::string& name, int frameTime)
 {
-    if (animations.find(name) != animations.end())
-    { 
-        currentAnimation = name;
-    }
-    else
-    {
-        pause();
-    }
+    changeAnimation(name);
     changeFrameTime(frameTime);
-    currentFrame = 0;
-    setTextureRect(animations[currentAnimation][currentFrame]);
 }
 
 void AnimatedSprite::tick(int deltaTime)
@@ -70,13 +56,9 @@ void AnimatedSprite::tick(int deltaTime)
         {
             elapsedTime -=  frameTime;
             if (currentFrame < (animations[currentAnimation].size() - 1))
-            {
                 currentFrame++;
-            }
             else
-            {
                 currentFrame = 0;
-            }
             setTextureRect(animations[currentAnimation][currentFrame]);
         }
     }
