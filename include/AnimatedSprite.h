@@ -6,8 +6,9 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include "ResourceManager.h"
+#include "ManagedSprite.h"
 
-class AnimatedSprite : public sf::Sprite
+class AnimatedSprite : public ManagedSprite 
 {
     public:
         AnimatedSprite(ResourceManager& manager, const std::string& name, 

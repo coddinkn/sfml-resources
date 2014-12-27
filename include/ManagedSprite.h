@@ -8,10 +8,7 @@
 class ManagedSprite : public sf::Sprite
 {
     public:
-        ManagedSprite(ResourceManager& manager,
-                       const std::string& textureName,
-                       bool isCentered = false);
-        ManagedSprite(const sf::Texture& texture, bool isCentered = false);
+        ManagedSprite(ResourceManager& manager, const std::string& name, bool isCentered = false);
 };
 
 #endif

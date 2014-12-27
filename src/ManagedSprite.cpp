@@ -1,15 +1,8 @@
 #include "ManagedSprite.h"
 
 ManagedSprite::ManagedSprite(ResourceManager& manager,
-                               const std::string& textureName,
-                               bool isCentered) :
-    ManagedSprite(manager.getTexture(textureName))
-{
-
-}
-
-ManagedSprite::ManagedSprite(const sf::Texture& texture, bool isCentered) :
-    sf::Sprite(texture)
+const std::string& textureName,
+bool isCentered) : sf::Sprite(manager.getTexture(textureName))
 {
     if (isCentered)   
         setOrigin(float(getTextureRect().width / 2.0),
