@@ -2,22 +2,21 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include "ResourceManager.h"
-#include "CenAnimSprite.h"
+#include "AnimatedSprite.h"
 
 int main()
 {
-
     sf::Clock time;
 
-    ResourceManager rm("res/textures", "res/animations");
+    ResourceManager manager("res/textures", "res/animations");
     
-    if (!rm)
+    if (!manager)
     {
         std::cout << "Resource Manager: Error opening files." << std::endl;
         return -1;
     }
 
-    CenAnimSprite test("testone", rm, "test", 1000);
+    AnimatedSprite test(manager, "testone", "test", 1000, true);
     
     test.setPosition(100, 100);
 

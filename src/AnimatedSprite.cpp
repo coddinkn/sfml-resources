@@ -2,10 +2,20 @@
 #include <sstream>
 #include <fstream>
 
-AnimatedSprite::AnimatedSprite(const std::string& name, ResourceManager& rm, const std::string& firstAnimation, int frameTime) :
-currentAnimation(firstAnimation), animations(rm.getAnimations(name)), sf::Sprite(rm.getTexture(name)), frameTime(frameTime) 
+AnimatedSprite::AnimatedSprite(ResourceManager& manager,
+                               const std::string& name,
+                               const std::string& firstAnimation,
+                               int frameTime, bool isCentered) :
+    currentAnimation(firstAnimation),
+    animations(manager.getAnimations(name)),
+    sf::Sprite(manager.getTexture(name)),
+    frameTime(frameTime) 
 {
     setTextureRect(animations[currentAnimation][currentFrame]);
+
+    if (isCentered)   
+        setOrigin(float(getTextureRect().width / 2.0),
+                  float(getTextureRect().height / 2.0));
 }
 
 void AnimatedSprite::play()
