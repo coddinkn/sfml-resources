@@ -6,7 +6,7 @@ AnimatedSprite::AnimatedSprite(ResourceManager& manager,
                                const std::string& name,
                                const std::string& firstAnimation,
                                int frameTime, bool isCentered) :
-    ManagedSprite(manager, name, isCentered),
+    sf::Sprite(manager.getTexture(name)),
     animations(manager.getAnimations(name))
 {
     changeAnimation(firstAnimation, frameTime);    

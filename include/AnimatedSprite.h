@@ -8,7 +8,7 @@
 #include "ResourceManager.h"
 #include "ManagedSprite.h"
 
-class AnimatedSprite : public ManagedSprite 
+class AnimatedSprite : public sf::Sprite 
 {
     public:
         AnimatedSprite(ResourceManager& manager, const std::string& name, 
