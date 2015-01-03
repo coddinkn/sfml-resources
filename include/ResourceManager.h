@@ -1,6 +1,7 @@
 #ifndef RESOURCE_MANAGER_H
 #define RESOURCE_MANAGER_H
 
+#include <iostream>
 #include <string>
 #include <vector>
 #include <map>
@@ -9,43 +10,52 @@
 class ResourceManager
 {
 public:
-    ResourceManager(const char* textureFilePath, const char* animationsFilePath);
+    ResourceManager(const std::string& resourceFilePath);
     const sf::Texture& getTexture(const std::string& name);
+    const std::map<std::string, sf::IntRect>& getFrames(const std::string& name);
     const std::map<std::string, std::vector<sf::IntRect>>& getAnimations(const std::string& name);
     operator bool();
-
+    void reportErrors(std::ostream& out);
 private:
-    std::string getParentDirectory(const std::string& filePath);
-
+    std::string parentDirectory;
     bool valid;
+    std::vector<std::string> errorMessages;
     struct Texture
     {
         Texture();
-        Texture(const std::string& file_name);
+        bool loaded = false;
         bool load();
         std::string file_name;
-        bool loaded = false;
+        void setFileName(const std::string& file_name);
         sf::Texture texture;   
+    };
+    struct Frames
+    {
+        Frames();
+        int width;
+        int height;
+        bool dimensioned = false;
+        void setDimensions(int width, int height);
+        void addFrame(const std::string& frame_name, int x, int y);
+        std::map<std::string, sf::IntRect> frames;
     };
     struct Animations
     {
         Animations();
-        ~Animations();
-        bool dimensioned = false;
-        void setDimensions(int width, int height);
-        void addAnimation(const std::string& animation_name, int x, int y,
-                          bool isVertical, int frames);
         int width;
         int height;
-        std::string file_name;
+        bool dimensioned = false;
+        void setDimensions(int width, int height);
+        void addAnimation(const std::string& animation_name, int x, int y, bool isVertical, int frames);
         std::map<std::string, std::vector<sf::IntRect>> animations; 
     };
-    std::map<std::string, Texture> textures;
-    std::map<std::string, Animations> collectionOfAnimations;
     
-    // Default values for non-existant Textures and Animations
     Texture defaultTexture;
     Animations defaultAnimations;
+    Frames defaultFrames;
+    std::map<std::string, Texture> textures;
+    std::map<std::string, Animations> setOfAnimations;
+    std::map<std::string, Frames> setOfFrames;
 };
 
 #endif

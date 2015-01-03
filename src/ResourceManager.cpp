@@ -2,98 +2,126 @@
 #include <fstream>
 #include <sstream>
 
-ResourceManager::ResourceManager(const char* textureFilePath, const char* animationsFilePath)
+ResourceManager::ResourceManager(const std::string& resourceFilePath)
 {
     // Default Texture to be used when non-existant ones are requested
     sf::Image defaultImage;
     defaultImage.create(64, 64, sf::Color(0xFF, 0x00, 0xFF));
     defaultTexture.texture.loadFromImage(defaultImage);
-    defaultTexture.loaded = true;    
-
+    defaultTexture.loaded = true;
+ 
     // Default Animations to be used when non-existant ones are requested
     defaultAnimations.width = 64;
     defaultAnimations.height = 64;
     defaultAnimations.dimensioned = true;
-    defaultAnimations.animations["null_animation"].push_back(sf::IntRect(0, 0, 64, 64));
-    
-    std::stringstream format;
+
+    // Default Frames to be used when non-existant ones are requested
+    defaultFrames.width = 64;
+    defaultFrames.height = 64;
+    defaultFrames.dimensioned = true;
+    defaultFrames.frames["null_frame"] = sf::IntRect(0, 0, 64, 64);
+
+    size_t lastSeparator = resourceFilePath.find_last_of('/');
+    if (lastSeparator == std::string::npos)
+        parentDirectory = "";
+    else
+        parentDirectory = resourceFilePath.substr(0, lastSeparator + 1);
+ 
     std::string line;
-    std::string name;
-    std::string parameter;
-
-    char direction;
-    int width;
-    int height;
-    int x;
-    int y;
-    int frames;
-
+    std::stringstream lineStream;
+    std::string command;
+    std::string argument;
+    std::vector<std::string> arguments;
+    std::vector<std::string> sourcedFiles;
+    std::map<std::string, std::string> resources;
+    
     // Load the texture list from disk
 
-    std::string textureParentDir = getParentDirectory(textureFilePath);
-    std::ifstream in(textureFilePath);    
+    std::ifstream in(resourceFilePath);    
     
     if (!in)
     {        
+        errorMessages.push_back(("error opening file " + resourceFilePath));
         valid = false;         
         return;   
     }
-    
-    std::string file_path;
 
-    while (std::getline(in, line))
+    for (int lineNumber = 1; std::getline(in, line); ++lineNumber)
     {
-        format.str(line);
-        format >> name;
-        format >> file_path;                     
-        textures[name] = Texture(textureParentDir + file_path);   
-        format.clear();
+        if (line != "" && line[0] != '#') 
+        {
+            lineStream.str(line);
+          
+            if (!lineStream) 
+            {
+                errorMessages.push_back(("fatal error on line " + std::to_string(lineNumber) + ":"));   
+                errorMessages.push_back("\terror reading line");    
+                valid = false;
+                return;
+            }
+        
+            lineStream >> command;
+            while (lineStream >> argument)
+            {
+                arguments.push_back(argument);
+            }
+    
+            if (command == "define" && arguments.size() == 2)
+            {
+                if (resources.find(arguments[0]) == resources.end() && (arguments[1] == "animated" || arguments[1] == "sprite"))
+                {
+                    resources[arguments[0]] = arguments[1];
+                }
+                else
+                {
+                    errorMessages.push_back(("syntax error on line " + std::to_string(lineNumber) + ":"));   
+                    errorMessages.push_back(("\t" + arguments[0] + " already defined"));    
+                }
+            }
+            else if (command == "dimension")
+            {
+                if (resources.find(arguments[0]) != resources.end())
+                {
+                    if (resources[arguments[0]] == "animated")
+                    {
+                        if (setOfAnimations.find(arguments[0]) == setOfAnimations.end())
+                        {
+                            
+                            
+                        }
+                    }
+                    else if (resources[arguments[0]] == "sprite")
+                    {
+
+                    }
+                }
+                else
+                {
+                    errorMessages.push_back(("syntax error on line " + std::to_string(lineNumber) + ":"));   
+                    errorMessages.push_back(("\t" + arguments[0] + " not defined"));    
+                }
+            }
+            else if (command == "texture")
+            {
+
+
+            }
+            else if (command == "animation")
+            {
+
+
+            }
+            else if (command == "frame")
+            {
+
+
+            }
+            lineStream.clear();
+            lineStream.str("");
+        }
     }
 
     in.close();
-
-    // Load the animations list from disk
-
-    in.open(animationsFilePath);
-
-    if (!in)
-    {
-        valid = false;
-        return;
-    }
-
-    while (std::getline(in, line))
-    {
-        format.str(line);
-        format >> name;
-       
-        if (collectionOfAnimations.find(name) == collectionOfAnimations.end())
-        {
-            collectionOfAnimations[name] = Animations();
-            collectionOfAnimations[name].animations["null_animation"] = defaultAnimations.animations["null_animation"];
-        }
-        
-        format >> parameter; 
-        
-        if (parameter == "dimensions")
-        {
-            format >> width;
-            format >> height;
-            collectionOfAnimations[name].setDimensions(width, height);
-        }
-        else
-        {
-            format >> x;
-            format >> y;
-            format >> direction;
-            format >> frames;
-            if (collectionOfAnimations[name].dimensioned)
-            {
-                collectionOfAnimations[name].addAnimation(parameter, x, y, (direction == 'v'), frames);
-            }
-        }
-        format.clear();
-    }
 
     valid = true;
 }
@@ -103,25 +131,23 @@ ResourceManager::operator bool()
     return valid;
 }
 
-/// Returns a string representing the parent directory of a given file path.
-/// The last file separator is retained. If the given path has no parent, an
-/// empty string is returned.
-std::string ResourceManager::getParentDirectory(const std::string& filePath)
+void ResourceManager::reportErrors(std::ostream& out)
 {
-    size_t lastSeparator = filePath.find_last_of('/');
-
-    if (lastSeparator == std::string::npos)
-        return "";
-    else
-        return filePath.substr(0, lastSeparator + 1);
+    out << "----------------------------------" << "\n";
+    out << "REPORTING RESOURCE MANAGER ERRORS:" << "\n";
+    out << "----------------------------------" << "\n";
+    for (auto itr = errorMessages.begin(); itr != errorMessages.end(); ++itr)
+    {
+        out << (*itr) << "\n";
+    }
+    out << "------------------------------------" << "\n";
+    out << "END OF RESOURCE MANAGER ERROR REPORT" << "\n";
+    out << "------------------------------------" << "\n";
 }
 
-ResourceManager::Texture::Texture()
-{
+ResourceManager::Texture::Texture() {}
 
-}
-
-ResourceManager::Texture::Texture(const std::string& file_name)
+void ResourceManager::Texture::setFileName(const std::string& file_name)
 {
     this->file_name = file_name;   
 }
@@ -133,18 +159,22 @@ bool ResourceManager::Texture::load()
 
 const sf::Texture& ResourceManager::getTexture(const std::string& name)
 {
-    if (!textures[name].loaded)
+    if (textures[name].loaded || textures[name].load())
     {
-        if (!textures[name].load())
-        { 
-            return defaultTexture.texture;
-        }
+        return textures[name].texture;
     }
-    return textures[name].texture;
+    else
+    {
+        errorMessages.push_back(("could not find or load " + name + "'s texture, using default."));
+        return defaultTexture.texture;
+    }
 }
 
-ResourceManager::Animations::Animations()
+ResourceManager::Animations::Animations() 
 {
+    std::vector<sf::IntRect> nullAnimation;
+    nullAnimation.push_back(sf::IntRect(0, 0, 64, 64));
+    animations["null_animation"] = nullAnimation; 
 }
 
 void ResourceManager::Animations::setDimensions(int width, int height)
@@ -159,7 +189,6 @@ void ResourceManager::Animations::addAnimation(const std::string& name, int x, i
     for (int i = 0; i < frames; i++)
     {
         animations[name].push_back(sf::IntRect());
-
         animations[name][i].width = width;
         animations[name][i].height = height;
 
@@ -178,13 +207,15 @@ void ResourceManager::Animations::addAnimation(const std::string& name, int x, i
 
 const std::map<std::string, std::vector<sf::IntRect>>& ResourceManager::getAnimations(const std::string& name)
 {
-    if (collectionOfAnimations.find(name) != collectionOfAnimations.end())
-        return collectionOfAnimations[name].animations;
+    if (setOfAnimations.find(name) != setOfAnimations.end())
+    {
+        return setOfAnimations[name].animations;
+    }
     else
+    {
+        errorMessages.push_back(("could not find " + name + "'s animations, using default."));
         return defaultAnimations.animations;
+    }
 }
 
-ResourceManager::Animations::~Animations()
-{
-}
-
+ResourceManager::Frames::Frames() {}

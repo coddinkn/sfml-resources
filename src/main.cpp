@@ -8,18 +8,6 @@ int main()
 {
     sf::Clock time;
 
-    ResourceManager manager("res/textures", "res/animations");
-    
-    if (!manager)
-    {
-        std::cout << "Resource Manager: Error opening files." << std::endl;
-        return -1;
-    }
-
-    AnimatedSprite test(manager, "testone", "test", 1000, true);
-    
-    test.setPosition(100, 100);
-
 	sf::RenderWindow window(sf::VideoMode(640, 480), "SFML Resource Manager");
 	window.setFramerateLimit(60);
 
@@ -37,18 +25,16 @@ int main()
                 window.close();
             }
 		
-            if(event.type == sf::Event::KeyPressed){
+            if(event.type == sf::Event::KeyPressed)
+            {
 
-                test.rotate(45);
             }
         
         }
 
-        test.tick(time.getElapsedTime().asMilliseconds());
         time.restart();
 
 		window.clear();
-        window.draw(test);
         window.display();
 
 	}
