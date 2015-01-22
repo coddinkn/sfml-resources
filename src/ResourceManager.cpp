@@ -1,4 +1,5 @@
 #include "ResourceManager.h"
+#include <iostream>
 #include <fstream>
 #include <sstream>
 
@@ -14,6 +15,7 @@ ResourceManager::ResourceManager(const std::string& resourceFilePath)
     defaultAnimations.width = 64;
     defaultAnimations.height = 64;
     defaultAnimations.dimensioned = true;
+    defaultAnimations.animations["null_animation"].push_back(sf::IntRect(0, 0, 64, 64));
 
     // Default Frames to be used when non-existant ones are requested
     defaultFrames.width = 64;
@@ -29,101 +31,138 @@ ResourceManager::ResourceManager(const std::string& resourceFilePath)
  
     std::string line;
     std::stringstream lineStream;
-    std::string command;
     std::string argument;
     std::vector<std::string> arguments;
     std::vector<std::string> sourcedFiles;
-    std::map<std::string, std::string> resources;
-    
-    // Load the texture list from disk
-
-    std::ifstream in(resourceFilePath);    
-    
-    if (!in)
-    {        
-        errorMessages.push_back(("error opening file " + resourceFilePath));
-        valid = false;         
-        return;   
-    }
-
-    for (int lineNumber = 1; std::getline(in, line); ++lineNumber)
-    {
-        if (line != "" && line[0] != '#') 
-        {
-            lineStream.str(line);
-          
-            if (!lineStream) 
-            {
-                errorMessages.push_back(("fatal error on line " + std::to_string(lineNumber) + ":"));   
-                errorMessages.push_back("\terror reading line");    
-                valid = false;
-                return;
-            }
+    std::ifstream in;    
+    sourcedFiles.push_back(resourceFilePath);    
         
-            lineStream >> command;
-            while (lineStream >> argument)
+    for (auto itr = sourcedFiles.begin(); itr != sourcedFiles.end(); ++itr)
+    {
+        in.open(*itr);
+        if (!in)
+        {        
+            errorMessages.push_back(("error opening file " + *itr));
+            valid = false;         
+            return;   
+        }
+        for (int lineNumber = 1; std::getline(in, line); ++lineNumber)
+        {
+            if (line != "" && line[0] != '#')    
             {
-                arguments.push_back(argument);
-            }
-    
-            if (command == "define" && arguments.size() == 2)
-            {
-                if (resources.find(arguments[0]) == resources.end() && (arguments[1] == "animated" || arguments[1] == "sprite"))
-                {
-                    resources[arguments[0]] = arguments[1];
+                std::cout << line << std::endl;
+                lineStream.str(line);
+                while (lineStream >> argument)
+                {            
+                    arguments.push_back(argument);
                 }
-                else
+                if (arguments[0] == "define")
                 {
-                    errorMessages.push_back(("syntax error on line " + std::to_string(lineNumber) + ":"));   
-                    errorMessages.push_back(("\t" + arguments[0] + " already defined"));    
-                }
-            }
-            else if (command == "dimension")
-            {
-                if (resources.find(arguments[0]) != resources.end())
-                {
-                    if (resources[arguments[0]] == "animated")
+                    if (!define(arguments[1], arguments.begin() + 2, arguments.end()))
                     {
-                        if (setOfAnimations.find(arguments[0]) == setOfAnimations.end())
+                        errorMessages.push_back(("error on line " + std::to_string(lineNumber)));
+                    }
+                }
+                else if (arguments[0] == "source")
+                {
+                    if (arguments.size() == 2)
+                        sourcedFiles.push_back((parentDirectory + arguments[1]));
+                    else
+                        errorMessages.push_back(("error on line " + std::to_string(lineNumber)));
+                }
+                else if (resources.find(arguments[0]) != resources.end() && arguments.size() > 2)
+                {
+                    if (arguments[1] == "texture" && arguments.size() >= 3)
+                    {
+                        if (textures.find(arguments[0]) == textures.end())
+                            textures[arguments[0]].setFileName(parentDirectory + arguments[2]);
+                        if(arguments.size() > 4 && arguments[3] == "smooth")
+                            textures[arguments[0]].texture.setSmooth(true);
+                                    
+                    }
+                    else if (arguments[1] == "dimensions" && resources[arguments[0]] != Type::sprite && arguments.size() == 4)
+                    {
+                        if (resources[arguments[0]] == Type::animated)
                         {
-                            
-                            
+                            setOfAnimations[arguments[0]].setDimensions(std::stoi(arguments[2]), std::stoi(arguments[3]));    
+                            std::cout << setOfAnimations[arguments[0]].width << " " << setOfAnimations[arguments[0]].height << std::endl; 
+                        }
+                        else if (resources[arguments[0]] == Type::sheet)
+                        {
+                            setOfFrames[arguments[0]].setDimensions(std::stoi(arguments[2]), std::stoi(arguments[3]));    
                         }
                     }
-                    else if (resources[arguments[0]] == "sprite")
+                    else if (arguments[1] == "frame" && resources[arguments[0]] == Type::sheet && arguments.size() == 5)
                     {
-
+                        setOfFrames[arguments[0]].addFrame(arguments[2], std::stoi(arguments[3]), std::stoi(arguments[4]));
+                    }
+                    else if (arguments[1] == "animation" && resources[arguments[0]] == Type::animated)
+                    {
+                        setOfAnimations[arguments[0]].addAnimation(arguments[2], std::stoi(arguments[3]), std::stoi(arguments[4]), (arguments[5] == "v"), std::stoi(arguments[6]));
+                    }
+                    else
+                    {
+                    
                     }
                 }
                 else
                 {
-                    errorMessages.push_back(("syntax error on line " + std::to_string(lineNumber) + ":"));   
-                    errorMessages.push_back(("\t" + arguments[0] + " not defined"));    
+                    errorMessages.push_back(("error on line " + std::to_string(lineNumber)));
                 }
+                arguments.erase(arguments.begin(), arguments.end());
+                lineStream.str("");
+                lineStream.clear();
             }
-            else if (command == "texture")
-            {
-
-
-            }
-            else if (command == "animation")
-            {
-
-
-            }
-            else if (command == "frame")
-            {
-
-
-            }
-            lineStream.clear();
-            lineStream.str("");
         }
+        in.close();
+    }
+    valid = true;
+
+    for (auto itr = resources.begin(); itr != resources.end(); ++itr)
+    {
+        std::cout << "resource name " << itr->first << std::endl;
     }
 
-    in.close();
+}
 
-    valid = true;
+bool ResourceManager::define(const std::string& name, std::vector<std::string>::iterator start, std::vector<std::string>::iterator end)
+{
+    std::string type;
+    for (auto itr = start; itr != end; ++itr)
+    {
+        type += *itr;   
+    }
+    
+    std::cout << type << std::endl;
+     
+    if (resources.find(name) != resources.end() || name == "define" || name == "source")
+    {
+        return false;
+    }
+    else if (type == "sprite")
+    {
+        resources[name] = Type::sprite;
+        setOfFrames[name];
+        setOfFrames[name].frames[name];
+        return true;
+    }
+    else if (type == "spritesheet") 
+    {
+        resources[name] = Type::sheet;
+        setOfFrames[name];
+        setOfFrames[name].frames[name];
+        return true;
+    }
+    else if (type == "animatedsprite")
+    {
+        resources[name] = Type::animated;
+        setOfAnimations[name];
+        return true;
+    }
+    else
+    {
+        return false;
+    }
 }
 
 ResourceManager::operator bool()
@@ -189,8 +228,8 @@ void ResourceManager::Animations::addAnimation(const std::string& name, int x, i
     for (int i = 0; i < frames; i++)
     {
         animations[name].push_back(sf::IntRect());
-        animations[name][i].width = width;
-        animations[name][i].height = height;
+        animations[name][i].width = this->width;
+        animations[name][i].height = this->height;
 
         if (isVertical)
         {
@@ -218,4 +257,35 @@ const std::map<std::string, std::vector<sf::IntRect>>& ResourceManager::getAnima
     }
 }
 
-ResourceManager::Frames::Frames() {}
+ResourceManager::Frames::Frames()
+{
+    frames["null_frame"] = sf::IntRect(0, 0, 64, 64);    
+}
+
+void ResourceManager::Frames::setDimensions(int width, int height)
+{
+    this->width = width;
+    this->height = height;   
+    dimensioned = true;
+}
+
+void ResourceManager::Frames::addFrame(const std::string& name, int x, int y)
+{
+    frames[name].left = x;
+    frames[name].top = y;
+    frames[name].width = width;
+    frames[name].height = height;
+}
+
+const std::map<std::string, sf::IntRect>& ResourceManager::getFrames(const std::string& name)
+{
+    if (setOfFrames.find(name) != setOfFrames.end())
+    {
+        return setOfFrames[name].frames; 
+    }
+    else
+    {
+        errorMessages.push_back(("could not find " + name + "'s frames, using default."));
+        return defaultFrames.frames;
+    }
+}

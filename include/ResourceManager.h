@@ -20,6 +20,14 @@ private:
     std::string parentDirectory;
     bool valid;
     std::vector<std::string> errorMessages;
+    enum Type
+    {
+        sprite,
+        animated,
+        sheet
+    };
+    bool define(const std::string& name, std::vector<std::string>::iterator start, std::vector<std::string>::iterator end);
+    std::map<std::string, Type> resources;
     struct Texture
     {
         Texture();
@@ -49,7 +57,6 @@ private:
         void addAnimation(const std::string& animation_name, int x, int y, bool isVertical, int frames);
         std::map<std::string, std::vector<sf::IntRect>> animations; 
     };
-    
     Texture defaultTexture;
     Animations defaultAnimations;
     Frames defaultFrames;
