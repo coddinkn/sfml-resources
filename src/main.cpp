@@ -9,10 +9,10 @@ int main()
     sf::Clock time;
 
     ResourceManager manager("res/resources.txt");
-    AnimatedSprite test(manager, "test", "testAnimation", 1000, true);
-    ManagedSprite test2(manager, "test2", true);
-    test.setPosition(64, 64);
-    test2.setPosition(64, 64);
+//   AnimatedSprite test(manager, "test", "testAnimation", 1000, true);
+//   ManagedSprite test2(manager, "test2", true);
+//   test.setPosition(64, 64);
+//   test2.setPosition(64, 64);
 	sf::RenderWindow window(sf::VideoMode(640, 480), "SFML Resource Manager");
 	window.setFramerateLimit(60);
 
@@ -32,17 +32,17 @@ int main()
 		
             if(event.type == sf::Event::KeyPressed)
             {
-                test.rotate(5);
+//                test.rotate(5);
             }
         
         }
 
-        test.tick(time.getElapsedTime().asMilliseconds());
-        time.restart();
+//        test.tick(time.getElapsedTime().asMilliseconds());
+//        time.restart();
 
 		window.clear();
-        window.draw(test);
-        window.draw(test2);
+//        window.draw(test);
+//        window.draw(test2);
         window.display();
 
 	}

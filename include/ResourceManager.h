@@ -1,33 +1,44 @@
-#ifndef RESOURCE_MANAGER_H
-#define RESOURCE_MANAGER_H
+#ifndef NEW_RESOURCE_MANAGER
+#define NEW_RESOURCE_MANAGER
 
 #include <iostream>
 #include <string>
 #include <vector>
+#include <queue>
 #include <map>
 #include <SFML/Graphics.hpp>
 
 class ResourceManager
 {
 public:
-    ResourceManager(const std::string& resourceFilePath);
+    ResourceManager(const std::string& res_file_path);
     const sf::Texture& getTexture(const std::string& name);
     const std::map<std::string, sf::IntRect>& getFrames(const std::string& name);
     const std::map<std::string, std::vector<sf::IntRect>>& getAnimations(const std::string& name);
-    operator bool();
-    void reportErrors(std::ostream& out);
+	operator bool();
 private:
-    std::string parentDirectory;
+    std::string file_path;
     bool valid;
-    std::vector<std::string> errorMessages;
-    enum Type
-    {
+    enum Type{
         sprite,
+        sheet,
         animated,
-        sheet
     };
-    bool define(const std::string& name, std::vector<std::string>::iterator start, std::vector<std::string>::iterator end);
     std::map<std::string, Type> resources;
+	struct Instruction
+    {
+        Instruction();
+        Instruction(const std::string& line);
+        char command;
+        std::string* arguments;
+        int arg_length;
+    };
+    std::queue<Instruction> instructions;
+    friend std::ostream& operator<<(std::ostream& out, Instruction ins);
+	bool define(std::string* arg_start, std::string* arg_end);
+    bool source(std::string* arg_start, std::string* arg_end);
+    bool dimension(std::string* arg_start, std::string* arg_end);
+    bool texture(std::string* arg_start, std::string* arg_end);
     struct Texture
     {
         Texture();
@@ -57,10 +68,10 @@ private:
         void addAnimation(const std::string& animation_name, int x, int y, bool isVertical, int frames);
         std::map<std::string, std::vector<sf::IntRect>> animations; 
     };
-    Texture defaultTexture;
-    Animations defaultAnimations;
-    Frames defaultFrames;
-    std::map<std::string, Texture> textures;
+    sf::Texture defaultTexture;
+    std::map<std::string, sf::IntRect> defaultFrames;
+	std::map<std::string, std::vector<sf::IntRect>> defaultAnimations;
+	std::map<std::string, Texture> textures;
     std::map<std::string, Animations> setOfAnimations;
     std::map<std::string, Frames> setOfFrames;
 };
