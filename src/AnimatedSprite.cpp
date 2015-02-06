@@ -9,7 +9,9 @@ AnimatedSprite::AnimatedSprite(ResourceManager& manager,
     sf::Sprite(manager.getTexture(name)),
     animations(manager.getAnimations(name))
 {
-    changeAnimation(firstAnimation, frameTime);    
+    animations["null_animation"][0].width = getTexture()->getSize().x;
+    animations["null_animation"][0].height = getTexture()->getSize().y;
+	changeAnimation(firstAnimation, frameTime);    
     
     if(isCentered)
         setOrigin(float(getTextureRect().width / 2.0),

@@ -1,5 +1,6 @@
+dimension test 69 69
 define test animated sprite 
 #test texture testAnimatedSprite.png smooth 
-#test dimensions 69 69  
+dimension test 69 69  
 #test animation testAnimation 0 0 h 3 
 #test animation testAnimation2 0 0 v 3

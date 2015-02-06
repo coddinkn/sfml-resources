@@ -51,8 +51,9 @@ ResourceManager::ResourceManager(const std::string& res_file_path)
                 if(!source(instructions.front().arguments + 1, instructions.front().arguments + instructions.front().arg_length)) std::cerr << instructions.front() << "\terror: problem opening file(s) being sourced" << std::endl; 
                 break;
             case 'd':
-                std::cerr << "DEMENSIONING" << std::endl;
-                break;
+                if(!dimension(instructions.front().arguments + 1, instructions.front().arguments + instructions.front().arg_length)) std::cerr << instructions.front() << "\terror: resource not defined or of non dimensionable type" << std::endl; 
+
+				break;
             case 't':
                 std::cerr << "TEXTURING" << std::endl;
                 break;
@@ -89,15 +90,17 @@ bool ResourceManager::define(std::string* arg_start, std::string* arg_end)
 	}
     else if(type == "animatedsprite") 
     {
-        //std::cerr << "animated sprite" << std::endl;
+        std::cerr << "animated sprite" << std::endl;
         resources[*arg_start] = Type::animated;
+		setOfAnimations[*arg_start] = Animations();
 		return true;
     }
     else if(type == "spritesheet")
     {
         //std::cerr << "sprite sheet" << std::endl;
      	resources[*arg_start] = Type::sheet;
-	    return true;
+	    setOfFrames[*arg_start] = Frames();
+		return true;
     }
     else if(type == "sprite")
     {
@@ -131,7 +134,28 @@ bool ResourceManager::source(std::string* arg_start, std::string* arg_end)
 
 bool ResourceManager::dimension(std::string* arg_start, std::string* arg_end)
 {
-	return true;
+	if((resources.find(*arg_start) == resources.end()) || ((arg_start + 2) != (arg_end -1 )))
+	{
+		//resource not yet defined or improper number of arguments
+		return false;
+	}
+	else if(resources[*arg_start] == Type::sheet)
+	{
+		std::cerr << "SHEET DIMENSIONED" << std::endl;		
+		setOfFrames[*arg_start].setDimensions(std::stoi(*(arg_start + 1)), std::stoi(*(arg_start + 2)));
+		return true;
+	}
+	else if(resources[*arg_start] == Type::animated)
+	{
+		std::cerr << "ANIMATIONS DIMENSIONED" << std::endl;		
+		setOfAnimations[*arg_start].setDimensions(std::stoi(*(arg_start + 1)), std::stoi(*(arg_start + 2)));
+		return true;
+	}
+	else
+	{
+		//resource not of dimensionable type
+		return false;
+	}
 }
 
 ResourceManager::Instruction::Instruction() {}
