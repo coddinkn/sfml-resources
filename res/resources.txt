@@ -1,6 +1,7 @@
-dimension test 69 69
-define test animated sprite 
-#test texture testAnimatedSprite.png smooth 
-dimension test 69 69  
-#test animation testAnimation 0 0 h 3 
-#test animation testAnimation2 0 0 v 3
+create test animated sprite 
+texture test testAnimatedSprite.png
+dimension test 64 64  
+create track sprite
+texture track track.png smooth
+#add test animation testAnimation 0 0 h 3 
+#add test animation testAnimation2 0 0 v 3

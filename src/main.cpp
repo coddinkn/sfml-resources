@@ -9,12 +9,14 @@ int main()
     sf::Clock time;
 
     ResourceManager manager("res/resources.txt");
-//   AnimatedSprite test(manager, "test", "testAnimation", 1000, true);
+    AnimatedSprite test(manager, "test", "testAnimation", 1000);
+	ManagedSprite track(manager, "track");
 //   ManagedSprite test2(manager, "test2", true);
-//   test.setPosition(64, 64);
 //   test2.setPosition(64, 64);
 	sf::RenderWindow window(sf::VideoMode(640, 480), "SFML Resource Manager");
 	window.setFramerateLimit(60);
+
+	track.setPosition(100, 100);
 
     time.restart();
 
@@ -41,7 +43,8 @@ int main()
 //        time.restart();
 
 		window.clear();
-//        window.draw(test);
+        window.draw(test);
+		window.draw(track);
 //        window.draw(test2);
         window.display();
 
