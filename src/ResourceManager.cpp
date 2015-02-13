@@ -155,9 +155,7 @@ bool ResourceManager::texture(std::string* arg_start, std::string* arg_end)
 	{	
 		textures[*arg_start].setFileName(file_path + *(arg_start + 1));
 		if((arg_start + 2) == (arg_end - 1) && ((*(arg_start + 2))[0] == 's'))
-		{
-			std::cerr << "setting smooth" << std::endl;
-		}
+			textures[*arg_start].texture.setSmooth(true);
 		return true;
 	}
 	else
