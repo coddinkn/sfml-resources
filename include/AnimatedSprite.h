@@ -13,7 +13,7 @@ class AnimatedSprite : public sf::Sprite
     public:
         AnimatedSprite(ResourceManager& manager, const std::string& name, 
                        const std::string& firstAnimation, int frameTime,
-                       bool isCentered = false);
+                       bool isCentered);
         void changeAnimation(const std::string& name);
         void changeAnimation(const std::string& name, int frameTime);
         void tick(int deltaTime);

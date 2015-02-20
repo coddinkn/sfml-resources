@@ -33,7 +33,7 @@ ResourceManager::ResourceManager(const std::string& res_file_path)
 
     while(std::getline(file, line))
     {
-        instructions.push(Instruction(line));            
+        if(line != "" && line != " " && line != "\n") instructions.push(Instruction(line));            
     }
 
     while(instructions.size() != 0)
@@ -57,6 +57,7 @@ ResourceManager::ResourceManager(const std::string& res_file_path)
                 if(!texture(instructions.front().arguments + 1, instructions.front().arguments + instructions.front().arg_length)) std::cerr << instructions.front() << "\terror: resource not created or of non texturable type" << std::endl; 
                 break;
             case 'a':
+                if(!add(instructions.front().arguments + 1, instructions.front().arguments + instructions.front().arg_length)) std::cerr << instructions.front() << "\terror: resource could not add specified parameter" << std::endl; 
                 break;
             default:  
                 //invalid command
@@ -67,9 +68,6 @@ ResourceManager::ResourceManager(const std::string& res_file_path)
 		instructions.pop();
 
     }
-
-	for(auto itr = resources.begin(); itr != resources.end(); ++itr)
-		std::cout << itr->first << std::endl;
 
 }
 
@@ -167,24 +165,39 @@ bool ResourceManager::texture(std::string* arg_start, std::string* arg_end)
 
 bool ResourceManager::add(std::string* arg_start, std::string* arg_end)
 {
-	if((resources.find(*arg_start) == resources.end()) || ((arg_start + 2) != (arg_end -1)))
+	if((resources.find(*arg_start) == resources.end()) || (arg_start + 1) == (arg_end - 1))
 	{
 		//resource not yet created or improper number of arguments
 		return false;
 	}
-	else if(resources[*arg_start] == Type::sheet)
+	else if((*(arg_start + 1))[0] == 'a' && resources[*arg_start] == Type::animated)
 	{
-		setOfFrames[*arg_start].setDimensions(std::stoi(*(arg_start + 1)), std::stoi(*(arg_start + 2)));
-		return true;
+		if((arg_start + 6) < arg_end)
+		{
+			setOfAnimations[*arg_start].addAnimation(*(arg_start + 2), std::stoi(*(arg_start + 3)), std::stoi(*(arg_start + 4)), ((*(arg_start + 5))[0] == 'v'), std::stoi(*(arg_start + 6)));
+			return true;
+		}
+		else
+		{
+			//invalid number of arguments
+			return false;
+		}
 	}
-	else if(resources[*arg_start] == Type::animated)
+	else if((*(arg_start + 1))[0] == 'f' && resources[*arg_start] == Type::sheet)
 	{
-		setOfAnimations[*arg_start].setDimensions(std::stoi(*(arg_start + 1)), std::stoi(*(arg_start + 2)));
-		return true;
+		if((arg_start + 4) < arg_end)
+		{
+			setOfFrames[*arg_start].addFrame(*(arg_start + 2), std::stoi(*(arg_start + 3)), std::stoi(*(arg_start + 4)));
+			return true;
+		}
+		else
+		{
+			return false;
+		}
 	}
 	else
 	{
-		//resource not of dimensionable type
+		//resource of imporper type to add specified parameter or not defined
 		return false;
 	}
 }

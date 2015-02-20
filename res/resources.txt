@@ -1,9 +1,10 @@
 create test animated sprite 
 texture test testAnimatedSprite.png
 dimension test 64 64  
-create track sprite
-texture track track.png smooth 
-create track2 sprite
-texture track2 track.png
-#add test animation testAnimation 0 0 h 3 
-#add test animation testAnimation2 0 0 v 3
+add test animation testAnimation 0 0 h 3 
+add test animation testAnimation2 0 0 v 3
+
+create hello sprite sheet
+texture hello testAnimatedSprite.png
+dimension hello 64 64
+add hello frame first 64 0
