@@ -5,3 +5,4 @@ SFML\ Resource\ Manager
 **/*.swo
 docs/**
 **/*.exe
+**/*.a
