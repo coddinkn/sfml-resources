@@ -1,51 +1,81 @@
 #include "ResourceManager.h"
 
+#include <iterator>
 #include <ostream>
 #include <fstream>
 #include <sstream>
 
-ResourceManager::ResourceManager(const std::string& res_file_path)
+ResourceManager::ResourceManager(const std::string& resourceFilePath)
 {
+    // Initialize the keywords that will be parsed from the resource file
+    initializeKeywords();
 
+    // Create the default images to be used in response to invalid requests
 	sf::Image defaultImage;
 	defaultImage.create(64, 64, sf::Color(0xFF, 0x00, 0xFF));
 	defaultTexture.loadFromImage(defaultImage);
-
 	defaultAnimations["null_animation"].push_back(sf::IntRect(0, 0, 64, 64));
-
 	defaultFrames["null_frame"] = sf::IntRect(0, 0, 64, 64);
 
-    size_t lastSeparator = res_file_path.find_last_of('/');
-    if(lastSeparator == std::string::npos) 
-        file_path = "";
+    // Get the path for the parent directory of the resource file.
+    // All resources will be located relative to this path
+    size_t lastSeparator = resourceFilePath.find_last_of('/');
+    if (lastSeparator == std::string::npos) 
+        parentDirectoryPath = "";
     else
-        file_path = res_file_path.substr(0, lastSeparator + 1);
+        parentDirectoryPath = resourceFilePath.substr(0, lastSeparator + 1);
     
-    std::ifstream file(res_file_path);
-
-    if(!file)
+    // Attempt to open the resource file
+    std::ifstream file(resourceFilePath);
+    if (!file)
     {
         valid = false;
         return;   
     }
 
+    // Read in each instruction from the resource file
     std::string line;
+    while (std::getline(file, line))
+        if (line != "" && line != " " && line != "\n")
+            instructions.push(split(line));
 
-    while(std::getline(file, line))
+    // Parse and process each command
+    while (instructions.size() != 0)
     {
-        if(line != "" && line != " " && line != "\n") instructions.push(Instruction(line));            
-    }
+        std::vector<std::string> current = instructions.front();
 
-    while(instructions.size() != 0)
-    {
-        
-        switch(instructions.front().command)
+        switch (parseCommand(current[0]))
+        {
+            case Command::ADD:
+                std::cout << "add" << std::endl;
+                break;
+            case Command::COMMENT:
+                std::cout << "comment" << std::endl;
+                break;
+            case Command::DIMENSION:
+                std::cout << "dimension" << std::endl;
+                break;
+            case Command::ESTABLISH:
+                std::cout << "establish" << std::endl;
+                break;
+            case Command::SOURCE:
+                std::cout << "source" << std::endl;
+                break;
+            case Command::TEXTURE:
+                std::cout << "texture" << std::endl;
+                break;
+            default:
+                std::cout << "invalid command" << std::endl;
+                break;
+        }
+        /*
+        switch (instructions.front().command)
         {
             case '#':            
 				//comment
                 break;
             case 'c':
-                if(!create(instructions.front().arguments + 1, instructions.front().arguments + instructions.front().arg_length)) std::cerr << instructions.front() << "\terror: improper type or redefinition of resource" << std::endl; 
+                if(!establish(instructions.front().arguments + 1, instructions.front().arguments + instructions.front().arg_length)) std::cerr << instructions.front() << "\terror: improper type or redefinition of resource" << std::endl; 
                 break;
             case 's':
                 if(!source(instructions.front().arguments + 1, instructions.front().arguments + instructions.front().arg_length)) std::cerr << instructions.front() << "\terror: problem opening file(s) being sourced" << std::endl; 
@@ -65,13 +95,13 @@ ResourceManager::ResourceManager(const std::string& res_file_path)
         }
 
         delete [] instructions.front().arguments;
-		instructions.pop();
+        */
 
+        instructions.pop();
     }
-
 }
 
-bool ResourceManager::create(std::string* arg_start, std::string* arg_end)
+bool ResourceManager::establish(std::string* arg_start, std::string* arg_end)
 {
     std::string type = "";
     for(auto itr = (arg_start + 1); itr != arg_end; ++itr) type += *itr;
@@ -83,17 +113,17 @@ bool ResourceManager::create(std::string* arg_start, std::string* arg_end)
 	}
     else if(type == "animatedsprite") 
     {
-        resources[*arg_start] = Type::animated;
+        resources[*arg_start] = Type::ANIMATED;
 		return true;
     }
     else if(type == "spritesheet")
     {
-     	resources[*arg_start] = Type::sheet;
+     	resources[*arg_start] = Type::SHEET;
 		return true;
     }
     else if(type == "sprite")
     {
-     	resources[*arg_start] = Type::sprite;
+     	resources[*arg_start] = Type::SPRITE;
 	    return true;
     }
     else
@@ -109,11 +139,9 @@ bool ResourceManager::source(std::string* arg_start, std::string* arg_end)
     std::string line;
     for(auto itr = arg_start; itr != arg_end; ++itr)
     {
-        file.open(file_path + (*itr));
+        file.open(parentDirectoryPath + (*itr));
         while(std::getline(file, line))
-        {
-            instructions.push(Instruction(line));    
-        }
+            instructions.push(split(line));    
         file.close();
     }
     return file;       
@@ -126,12 +154,12 @@ bool ResourceManager::dimension(std::string* arg_start, std::string* arg_end)
 		//resource not yet created or improper number of arguments
 		return false;
 	}
-	else if(resources[*arg_start] == Type::sheet)
+	else if(resources[*arg_start] == Type::SHEET)
 	{
 		setOfFrames[*arg_start].setDimensions(std::stoi(*(arg_start + 1)), std::stoi(*(arg_start + 2)));
 		return true;
 	}
-	else if(resources[*arg_start] == Type::animated)
+	else if(resources[*arg_start] == Type::ANIMATED)
 	{
 		setOfAnimations[*arg_start].setDimensions(std::stoi(*(arg_start + 1)), std::stoi(*(arg_start + 2)));
 		return true;
@@ -149,9 +177,9 @@ bool ResourceManager::texture(std::string* arg_start, std::string* arg_end)
 	{
 		return false;
 	}
-	else if(resources[*arg_start] == Type::sheet || resources[*arg_start] == Type::animated || resources[*arg_start] == Type::sprite)
+	else if(resources[*arg_start] == Type::SHEET || resources[*arg_start] == Type::ANIMATED || resources[*arg_start] == Type::SPRITE)
 	{	
-		textures[*arg_start].setFileName(file_path + *(arg_start + 1));
+		textures[*arg_start].setFileName(parentDirectoryPath + *(arg_start + 1));
 		if((arg_start + 2) == (arg_end - 1) && ((*(arg_start + 2))[0] == 's'))
 			textures[*arg_start].texture.setSmooth(true);
 		return true;
@@ -170,7 +198,7 @@ bool ResourceManager::add(std::string* arg_start, std::string* arg_end)
 		//resource not yet created or improper number of arguments
 		return false;
 	}
-	else if((*(arg_start + 1))[0] == 'a' && resources[*arg_start] == Type::animated)
+	else if((*(arg_start + 1))[0] == 'a' && resources[*arg_start] == Type::ANIMATED)
 	{
 		if((arg_start + 6) < arg_end)
 		{
@@ -183,7 +211,7 @@ bool ResourceManager::add(std::string* arg_start, std::string* arg_end)
 			return false;
 		}
 	}
-	else if((*(arg_start + 1))[0] == 'f' && resources[*arg_start] == Type::sheet)
+	else if((*(arg_start + 1))[0] == 'f' && resources[*arg_start] == Type::SHEET)
 	{
 		if((arg_start + 4) < arg_end)
 		{
@@ -202,6 +230,60 @@ bool ResourceManager::add(std::string* arg_start, std::string* arg_end)
 	}
 }
 
+/// Initializes the text keywords associated with each type and command
+void ResourceManager::initializeKeywords()
+{
+    commandMap["add"] = Command::ADD;
+    commandMap["#"] = Command::COMMENT;
+    commandMap["establish"] = Command::ESTABLISH;
+    commandMap["dimension"] = Command::DIMENSION;
+    commandMap["source"] = Command::SOURCE;
+    commandMap["texture"] = Command::TEXTURE;
+
+    typeMap["animated"] = Type::ANIMATED;
+    typeMap["sheet"] = Type::SHEET;
+    typeMap["sprite"] = Type::SPRITE;
+}
+
+/// Finds the command associated with a given input string
+ResourceManager::Command ResourceManager::parseCommand(std::string command)
+{
+    // Search for the command within the map
+    auto matchedCommand = commandMap.find(command);
+
+    // If the search fails, return INVALID. Otherwise, return what was found
+    if (matchedCommand == commandMap.end())
+        return Command::INVALID_COMMAND;
+    else
+        return matchedCommand->second;
+}
+
+/// Finds the resource type associated with a given input string
+ResourceManager::Type ResourceManager::parseType(std::string type)
+{
+    // Search for the type within the map
+    auto matchedType = typeMap.find(type);
+
+    // If the search fails, return INVALID. Otherwise, return what was found
+    if (matchedType == typeMap.end())
+        return Type::INVALID_TYPE;
+    else
+        return matchedType->second;
+}
+
+std::vector<std::string> ResourceManager::split(const std::string& line)
+{
+    // A stringstream will read in separate words and discard whitespace
+    std::istringstream parser(line);
+    
+    // Fill a vector with every word between the start and end of the stream
+    std::vector<std::string> words{std::istream_iterator<std::string>(parser),
+                                   std::istream_iterator<std::string>()};
+
+    return words;
+}
+
+/*
 ResourceManager::Instruction::Instruction() {}
 
 ResourceManager::Instruction::Instruction(const std::string& line)
@@ -238,6 +320,7 @@ std::ostream& operator<<(std::ostream& out, ResourceManager::Instruction ins)
 	return out;
 
 }
+*/
 
 ResourceManager::Texture::Texture() {}
 

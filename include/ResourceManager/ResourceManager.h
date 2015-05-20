@@ -11,20 +11,33 @@
 class ResourceManager
 {
 public:
-	ResourceManager(const std::string& res_file_path);
+	ResourceManager(const std::string& res_parentDirectoryPath);
 	const sf::Texture& getTexture(const std::string& name);
 	const std::map<std::string, sf::IntRect>& getFrames(const std::string& name);
 	const std::map<std::string, std::vector<sf::IntRect>>& getAnimations(const std::string& name);
 	operator bool();
 private:
-    std::string file_path;
-    bool valid;
-    enum Type{
-        sprite,
-        sheet,
-        animated,
+    void initializeKeywords(); 
+
+    enum Command
+    {
+        ADD, COMMENT, ESTABLISH, DIMENSION, SOURCE, TEXTURE, INVALID_COMMAND
     };
+    std::map<std::string, Command> commandMap;
+    Command parseCommand(std::string command);
+
+    enum Type { ANIMATED, SHEET, SPRITE, INVALID_TYPE }; 
+    std::map<std::string, Type> typeMap;
+    Type parseType(std::string type);
+
     std::map<std::string, Type> resources;
+    std::string parentDirectoryPath;
+    bool valid;
+
+    std::queue<std::vector<std::string>> instructions;
+    std::vector<std::string> split(const std::string& line);
+
+    /*
 	struct Instruction
     {
 	    Instruction();
@@ -35,7 +48,9 @@ private:
     };
     std::queue<Instruction> instructions;
     friend std::ostream& operator<<(std::ostream& out, Instruction ins);
-	bool create(std::string* arg_start, std::string* arg_end);
+    */
+
+    bool establish(std::string* arg_start, std::string* arg_end);
     bool source(std::string* arg_start, std::string* arg_end);
     bool dimension(std::string* arg_start, std::string* arg_end);
     bool texture(std::string* arg_start, std::string* arg_end);
