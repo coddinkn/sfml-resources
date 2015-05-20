@@ -1,5 +1,6 @@
 #include "ResourceManager.h"
 
+#include <iostream>
 #include <iterator>
 #include <ostream>
 #include <fstream>
@@ -57,9 +58,11 @@ ResourceManager::ResourceManager(const std::string& resourceFilePath)
                 break;
             case Command::ESTABLISH:
                 std::cout << "establish" << std::endl;
+                establish(current[1], current[2]);
                 break;
             case Command::SOURCE:
                 std::cout << "source" << std::endl;
+                source(current);
                 break;
             case Command::TEXTURE:
                 std::cout << "texture" << std::endl;
@@ -101,67 +104,65 @@ ResourceManager::ResourceManager(const std::string& resourceFilePath)
     }
 }
 
-bool ResourceManager::establish(std::string* arg_start, std::string* arg_end)
+/// Registers a new resource with the management system
+bool ResourceManager::establish(std::string type, std::string name)
 {
-    std::string type = "";
-    for(auto itr = (arg_start + 1); itr != arg_end; ++itr) type += *itr;
-
-	if(resources.find(*arg_start) != resources.end())
+    // Do nothing if the resource has already been created
+	if (resources.find(name) != resources.end())
 	{
-		//resource already created
 		return false;
 	}
-    else if(type == "animatedsprite") 
+    else if (type == "animated") 
     {
-        resources[*arg_start] = Type::ANIMATED;
+        resources[name] = Type::ANIMATED;
 		return true;
     }
-    else if(type == "spritesheet")
+    else if (type == "sheet")
     {
-     	resources[*arg_start] = Type::SHEET;
+     	resources[name] = Type::SHEET;
 		return true;
     }
-    else if(type == "sprite")
+    else if (type == "sprite")
     {
-     	resources[*arg_start] = Type::SPRITE;
+     	resources[name] = Type::SPRITE;
 	    return true;
     }
-    else
+    else // Fail if the type is invalid
     {
-        //improper type
         return false;
     }
 }
 
-bool ResourceManager::source(std::string* arg_start, std::string* arg_end)
+/// Inserts additional instructions from another file
+bool ResourceManager::source(const std::vector<std::string>& arguments)
 {
     std::ifstream file;
     std::string line;
-    for(auto itr = arg_start; itr != arg_end; ++itr)
+    for (int i = 1; i < arguments.size(); ++i)
     {
-        file.open(parentDirectoryPath + (*itr));
-        while(std::getline(file, line))
+        file.open(parentDirectoryPath + arguments[i]);
+        while (std::getline(file, line))
             instructions.push(split(line));    
         file.close();
     }
-    return file;       
+    return file;
 }
 
-bool ResourceManager::dimension(std::string* arg_start, std::string* arg_end)
+bool ResourceManager::dimension(const std::string& name, int width, int height)
 {
-	if((resources.find(*arg_start) == resources.end()) || ((arg_start + 2) != (arg_end -1)))
+	if (resources.find(name) == resources.end())
 	{
 		//resource not yet created or improper number of arguments
 		return false;
 	}
-	else if(resources[*arg_start] == Type::SHEET)
+	else if (resources[name] == Type::SHEET)
 	{
-		setOfFrames[*arg_start].setDimensions(std::stoi(*(arg_start + 1)), std::stoi(*(arg_start + 2)));
+		setOfFrames[name].setDimensions(width, height);
 		return true;
 	}
-	else if(resources[*arg_start] == Type::ANIMATED)
+	else if (resources[name] == Type::ANIMATED)
 	{
-		setOfAnimations[*arg_start].setDimensions(std::stoi(*(arg_start + 1)), std::stoi(*(arg_start + 2)));
+		setOfAnimations[name].setDimensions(width, height);
 		return true;
 	}
 	else

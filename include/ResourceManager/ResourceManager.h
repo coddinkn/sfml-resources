@@ -1,7 +1,6 @@
-#ifndef NEW_RESOURCE_MANAGER
-#define NEW_RESOURCE_MANAGER
+#ifndef RESOURCE_MANAGER_H
+#define RESOURCE_MANAGER_H
 
-#include <iostream>
 #include <string>
 #include <vector>
 #include <queue>
@@ -16,6 +15,7 @@ public:
 	const std::map<std::string, sf::IntRect>& getFrames(const std::string& name);
 	const std::map<std::string, std::vector<sf::IntRect>>& getAnimations(const std::string& name);
 	operator bool();
+
 private:
     void initializeKeywords(); 
 
@@ -37,24 +37,12 @@ private:
     std::queue<std::vector<std::string>> instructions;
     std::vector<std::string> split(const std::string& line);
 
-    /*
-	struct Instruction
-    {
-	    Instruction();
-        Instruction(const std::string& line);
-		char command;
-        std::string* arguments;
-        int arg_length;
-    };
-    std::queue<Instruction> instructions;
-    friend std::ostream& operator<<(std::ostream& out, Instruction ins);
-    */
-
-    bool establish(std::string* arg_start, std::string* arg_end);
-    bool source(std::string* arg_start, std::string* arg_end);
-    bool dimension(std::string* arg_start, std::string* arg_end);
+    bool establish(std::string type, std::string name);
+    bool source(const std::vector<std::string>& arguments);
+    bool dimension(const std::string& name, int width, int height);
     bool texture(std::string* arg_start, std::string* arg_end);
 	bool add(std::string* arg_start, std::string* arg_end); 
+    
     struct Texture
     {
         Texture();
@@ -64,6 +52,7 @@ private:
         void setFileName(const std::string& file_name);
         sf::Texture texture;   
     };
+
     struct Frames
     {
         Frames();
@@ -74,6 +63,7 @@ private:
         void addFrame(const std::string& frame_name, int x, int y);
         std::map<std::string, sf::IntRect> frames;
     };
+
     struct Animations
     {
         Animations();
@@ -84,6 +74,7 @@ private:
         void addAnimation(const std::string& animation_name, int x, int y, bool isVertical, int frames);
         std::map<std::string, std::vector<sf::IntRect>> animations; 
     };
+
     sf::Texture defaultTexture;
     std::map<std::string, sf::IntRect> defaultFrames;
 	std::map<std::string, std::vector<sf::IntRect>> defaultAnimations;
