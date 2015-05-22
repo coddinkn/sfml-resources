@@ -12,11 +12,11 @@ ResourceManager::ResourceManager(const std::string& resourceFilePath)
     initializeKeywords();
 
     // Create the default images to be used in response to invalid requests
-	sf::Image defaultImage;
-	defaultImage.create(64, 64, sf::Color(0xFF, 0x00, 0xFF));
-	defaultTexture.loadFromImage(defaultImage);
-	defaultAnimations["null_animation"].push_back(sf::IntRect(0, 0, 64, 64));
-	defaultFrames["null_frame"] = sf::IntRect(0, 0, 64, 64);
+    sf::Image defaultImage;
+    defaultImage.create(64, 64, sf::Color(0xFF, 0x00, 0xFF));
+    defaultTexture.loadFromImage(defaultImage);
+    defaultAnimations["null_animation"].push_back(sf::IntRect(0, 0, 64, 64));
+    defaultFrames["null_frame"] = sf::IntRect(0, 0, 64, 64);
 
     // Get the path for the parent directory of the resource file.
     // All resources will be located relative to this path
@@ -41,200 +41,212 @@ ResourceManager::ResourceManager(const std::string& resourceFilePath)
             instructions.push(split(line));
 
     // Parse and process each command
+    int lineNumber = 1;
+    std::string error;
     while (instructions.size() != 0)
     {
         std::vector<std::string> current = instructions.front();
+        Command command = parseCommand(current[0]);
 
-        switch (parseCommand(current[0]))
+        // Ensure that the correct number of arguments are given
+        if (checkArgumentNumber(command, current.size()))
         {
-            case Command::ADD:
-                std::cout << "add" << std::endl;
-                break;
-            case Command::COMMENT:
-                std::cout << "comment" << std::endl;
-                break;
-            case Command::DIMENSION:
-                std::cout << "dimension" << std::endl;
-                break;
-            case Command::ESTABLISH:
-                std::cout << "establish" << std::endl;
-                establish(current[1], current[2]);
-                break;
-            case Command::SOURCE:
-                std::cout << "source" << std::endl;
-                source(current);
-                break;
-            case Command::TEXTURE:
-                std::cout << "texture" << std::endl;
-                break;
-            default:
-                std::cout << "invalid command" << std::endl;
-                break;
+            switch (command)
+            {
+                case Command::ADD_ANIMATION:
+                    break;
+                case Command::ADD_FRAME:
+                    break;
+                case Command::COMMENT:
+                    break;
+                case Command::DIMENSION:
+                    dimension(current[1], std::stoi(current[2]),
+                              std::stoi(current[3]), error);
+                    break;
+                case Command::ESTABLISH:
+                    establish(parseType(current[1]), current[2], error);
+                    break;
+                case Command::SOURCE:
+                    source(current[1], error);
+                    break;
+                case Command::TEXTURE:
+                    texture(current[1], current[2], current[3], error);
+                    break;
+                default:
+                    error = "Unrecognized command \"" + current[0] + "\"";
+                    break;
+            }
         }
-        /*
-        switch (instructions.front().command)
+        else
         {
-            case '#':            
-				//comment
-                break;
-            case 'c':
-                if(!establish(instructions.front().arguments + 1, instructions.front().arguments + instructions.front().arg_length)) std::cerr << instructions.front() << "\terror: improper type or redefinition of resource" << std::endl; 
-                break;
-            case 's':
-                if(!source(instructions.front().arguments + 1, instructions.front().arguments + instructions.front().arg_length)) std::cerr << instructions.front() << "\terror: problem opening file(s) being sourced" << std::endl; 
-                break;
-            case 'd':
-                if(!dimension(instructions.front().arguments + 1, instructions.front().arguments + instructions.front().arg_length)) std::cerr << instructions.front() << "\terror: resource not created or of non dimensionable type" << std::endl; 
-				break;
-            case 't':
-                if(!texture(instructions.front().arguments + 1, instructions.front().arguments + instructions.front().arg_length)) std::cerr << instructions.front() << "\terror: resource not created or of non texturable type" << std::endl; 
-                break;
-            case 'a':
-                if(!add(instructions.front().arguments + 1, instructions.front().arguments + instructions.front().arg_length)) std::cerr << instructions.front() << "\terror: resource could not add specified parameter" << std::endl; 
-                break;
-            default:  
-                //invalid command
-                break; 
+            error = "Invalid number of arguments for command \"" + current[0]
+                    + "\"";
         }
 
-        delete [] instructions.front().arguments;
-        */
+        // Print out error information if an error occurred
+        if (error != "")
+        {
+            std::cerr << "(ResourceManager) " << error << ':' << std::endl;
+            std::cerr << "\t[" << lineNumber << "]:";
+            for (int i = 0; i < current.size(); ++i)
+                std::cerr << ' ' << current[i];
+            std::cerr << std::endl;
+        }
 
+        // Clean up and reset error status
         instructions.pop();
+        lineNumber++;
+        error = "";
     }
 }
 
 /// Registers a new resource with the management system
-bool ResourceManager::establish(std::string type, std::string name)
+void ResourceManager::establish(ResourceManager::Type type, 
+                                const std::string& name, std::string& error)
 {
-    // Do nothing if the resource has already been created
-	if (resources.find(name) != resources.end())
-	{
-		return false;
-	}
-    else if (type == "animated") 
+    if (resources.find(name) != resources.end())
     {
-        resources[name] = Type::ANIMATED;
-		return true;
+        error = "Cannot establish \"" + name
+                + "\", it has already been established";
     }
-    else if (type == "sheet")
+    if (type == Type::INVALID_TYPE)
     {
-     	resources[name] = Type::SHEET;
-		return true;
+        error = "The specified type is invalid";
     }
-    else if (type == "sprite")
+    else // Non-error case
     {
-     	resources[name] = Type::SPRITE;
-	    return true;
-    }
-    else // Fail if the type is invalid
-    {
-        return false;
+        resources[name] = type;
     }
 }
 
 /// Inserts additional instructions from another file
-bool ResourceManager::source(const std::vector<std::string>& arguments)
+void ResourceManager::source(const std::string& fileName, std::string& error)
 {
-    std::ifstream file;
-    std::string line;
-    for (int i = 1; i < arguments.size(); ++i)
+    std::ifstream file(parentDirectoryPath + fileName);
+
+    if (!file)
     {
-        file.open(parentDirectoryPath + arguments[i]);
+        error = "Failed to open " + parentDirectoryPath + fileName;
+    }
+    else // Non-error case
+    {
+        std::string line;
         while (std::getline(file, line))
             instructions.push(split(line));    
-        file.close();
     }
-    return file;
+
+    file.close();
 }
 
-bool ResourceManager::dimension(const std::string& name, int width, int height)
+/// Updates the dimensions of the frames within a sprite sheet or animation
+void ResourceManager::dimension(const std::string& name, int width, int height,
+                                std::string& error)
 {
-	if (resources.find(name) == resources.end())
-	{
-		//resource not yet created or improper number of arguments
-		return false;
-	}
-	else if (resources[name] == Type::SHEET)
-	{
-		setOfFrames[name].setDimensions(width, height);
-		return true;
-	}
-	else if (resources[name] == Type::ANIMATED)
-	{
-		setOfAnimations[name].setDimensions(width, height);
-		return true;
-	}
-	else
-	{
-		//resource not of dimensionable type
-		return false;
-	}
+    if (resources.find(name) == resources.end())
+    {
+        error = "The resource \"" + name + "\" does not exist";
+    }
+    else if (resources[name] == Type::SHEET)
+    {
+        setOfFrames[name].setDimensions(width, height);
+    }
+    else if (resources[name] == Type::ANIMATED)
+    {
+        setOfAnimations[name].setDimensions(width, height);
+    }
+    else
+    {
+        error = "The resource \"" + name + "\" is not of dimensionable type";
+    }
 }
 
-bool ResourceManager::texture(std::string* arg_start, std::string* arg_end)
+void ResourceManager::texture(const std::string& name, const std::string& file,
+                              const std::string& filtering, std::string& error)
 {
-	if((resources.find(*arg_start) == resources.end()) || (((arg_start + 1) != (arg_end -1)) && (((arg_start + 2) != (arg_end -1)))))
-	{
-		return false;
-	}
-	else if(resources[*arg_start] == Type::SHEET || resources[*arg_start] == Type::ANIMATED || resources[*arg_start] == Type::SPRITE)
-	{	
-		textures[*arg_start].setFileName(parentDirectoryPath + *(arg_start + 1));
-		if((arg_start + 2) == (arg_end - 1) && ((*(arg_start + 2))[0] == 's'))
-			textures[*arg_start].texture.setSmooth(true);
-		return true;
-	}
-	else
-	{
-		//resource not of texturable type
-		return false;
-	}
+    if (resources.find(name) == resources.end())
+    {
+        error = "The resource \"" + name + "\" does not exist";
+    }
+    else if (resources[name] == Type::INVALID_TYPE)
+    {
+        error = "The specified type is invalid";
+    }
+    else if (filtering != "smooth" && filtering != "rough")
+    {
+        error = "Unrecognized filtering flag \"" + filtering + "\"";
+    }
+    else // Non-error case
+    {
+        textures[name].setFileName(parentDirectoryPath + file);
+
+        if (filtering == "smooth")
+            textures[name].texture.setSmooth(true);
+    }
 }
 
+void ResourceManager::newAnimation(const std::string& resourceName,
+                                   const std::string& animationName, int x,
+                                   int y, bool isVertical, int frameCount,
+                                   std::string& error)
+{
+    // TODO implement
+}
+
+void ResourceManager::newFrame(const std::string& resourceName,
+                               const std::string& frameName, int x, int y,
+                               std::string& error)
+{
+    // TODO implement
+}
+
+/*
 bool ResourceManager::add(std::string* arg_start, std::string* arg_end)
 {
-	if((resources.find(*arg_start) == resources.end()) || (arg_start + 1) == (arg_end - 1))
-	{
-		//resource not yet created or improper number of arguments
-		return false;
-	}
-	else if((*(arg_start + 1))[0] == 'a' && resources[*arg_start] == Type::ANIMATED)
-	{
-		if((arg_start + 6) < arg_end)
-		{
-			setOfAnimations[*arg_start].addAnimation(*(arg_start + 2), std::stoi(*(arg_start + 3)), std::stoi(*(arg_start + 4)), ((*(arg_start + 5))[0] == 'v'), std::stoi(*(arg_start + 6)));
-			return true;
-		}
-		else
-		{
-			//invalid number of arguments
-			return false;
-		}
-	}
-	else if((*(arg_start + 1))[0] == 'f' && resources[*arg_start] == Type::SHEET)
-	{
-		if((arg_start + 4) < arg_end)
-		{
-			setOfFrames[*arg_start].addFrame(*(arg_start + 2), std::stoi(*(arg_start + 3)), std::stoi(*(arg_start + 4)));
-			return true;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	else
-	{
-		//resource of imporper type to add specified parameter or not defined
-		return false;
-	}
+    if (resources.find(*arg_start) == resources.end())
+    {
+        //resource not yet created or improper number of arguments
+        return false;
+    }
+    else if((*(arg_start + 1))[0] == 'a' && resources[*arg_start] == Type::ANIMATED)
+    {
+        if((arg_start + 6) < arg_end)
+        {
+            setOfAnimations[*arg_start].addAnimation(*(arg_start + 2), std::stoi(*(arg_start + 3)), std::stoi(*(arg_start + 4)), ((*(arg_start + 5))[0] == 'v'), std::stoi(*(arg_start + 6)));
+            return true;
+        }
+        else
+        {
+            //invalid number of arguments
+            return false;
+        }
+    }
+    else if((*(arg_start + 1))[0] == 'f' && resources[*arg_start] == Type::SHEET)
+    {
+        if((arg_start + 4) < arg_end)
+        {
+            setOfFrames[*arg_start].addFrame(*(arg_start + 2), std::stoi(*(arg_start + 3)), std::stoi(*(arg_start + 4)));
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+    else
+    {
+        //resource of imporper type to add specified parameter or not defined
+        return false;
+    }
 }
+*/
+
+///// Parsing functions /////
 
 /// Initializes the text keywords associated with each type and command
 void ResourceManager::initializeKeywords()
 {
-    commandMap["add"] = Command::ADD;
+    commandMap["add-animation"] = Command::ADD_ANIMATION;
+    commandMap["add-frame"] = Command::ADD_FRAME;
     commandMap["#"] = Command::COMMENT;
     commandMap["establish"] = Command::ESTABLISH;
     commandMap["dimension"] = Command::DIMENSION;
@@ -244,6 +256,16 @@ void ResourceManager::initializeKeywords()
     typeMap["animated"] = Type::ANIMATED;
     typeMap["sheet"] = Type::SHEET;
     typeMap["sprite"] = Type::SPRITE;
+
+    elementMap["animation"];
+    elementMap["frame"];
+
+    argumentNumbers[Command::ADD_ANIMATION] = 8;
+    argumentNumbers[Command::ADD_FRAME] = 6;
+    argumentNumbers[Command::ESTABLISH] = 4;
+    argumentNumbers[Command::DIMENSION] = 4;
+    argumentNumbers[Command::SOURCE] = 2;
+    argumentNumbers[Command::TEXTURE] = 4;
 }
 
 /// Finds the command associated with a given input string
@@ -272,6 +294,37 @@ ResourceManager::Type ResourceManager::parseType(std::string type)
         return matchedType->second;
 }
 
+ResourceManager::Element ResourceManager::parseElement(const std::string& element)
+{
+    // Search for the element within the appropriate keyword map
+    auto matchedElement = elementMap.find(element);
+
+    // If the search fails, return INVALID. Otherwise, return what was found
+    if (matchedElement == elementMap.end())
+        return Element::INVALID_ELEMENT;
+    else
+        return matchedElement->second;
+}
+
+// Verifies whether the number of arguments is correct for a given command
+bool ResourceManager::checkArgumentNumber(Command command, int number)
+{
+    // Search for the number within the argument length map
+    auto matchedNumber = argumentNumbers.find(command);
+
+    // If the command is not found, assume the number of arguments doesn't
+    // matter (return true)
+    if (matchedNumber == argumentNumbers.end())
+        return true;
+    else
+    {
+        if (number == matchedNumber->second)
+            return true;
+        else
+            return false;
+    }
+}
+
 std::vector<std::string> ResourceManager::split(const std::string& line)
 {
     // A stringstream will read in separate words and discard whitespace
@@ -284,50 +337,13 @@ std::vector<std::string> ResourceManager::split(const std::string& line)
     return words;
 }
 
-/*
-ResourceManager::Instruction::Instruction() {}
-
-ResourceManager::Instruction::Instruction(const std::string& line)
-{
-
-    std::stringstream lineStream;
-    lineStream.str(line);
-
-    arg_length = 1;
-    for(int i = 0; i < (line.length() - 1); i++)
-    {
-        if((line[i] == ' ') && (line[i + 1] != ' '))
-            arg_length++;
-    }
-    
-    arguments = new std::string[arg_length];
-    std::string word;
-
-    for(int i = 0; lineStream >> word; ++i)
-    {
-        arguments[i] = word;   
-    }
-
-    command = arguments[0][0];
-
-}
-
-std::ostream& operator<<(std::ostream& out, ResourceManager::Instruction ins)
-{
-
-	for(int i = 0; i < ins.arg_length; ++i)
-		out << ins.arguments[i] << " ";
-	out << std::endl;
-	return out;
-
-}
-*/
+///// Texture struct functions /////
 
 ResourceManager::Texture::Texture() {}
 
 void ResourceManager::Texture::setFileName(const std::string& file_name)
 {
-    this->file_name = file_name;   
+        this->file_name = file_name;   
 }
 
 bool ResourceManager::Texture::load()
@@ -339,14 +355,16 @@ const sf::Texture& ResourceManager::getTexture(const std::string& name)
 {
     if (textures[name].loaded || textures[name].load())
     {
-		return textures[name].texture;
+        return textures[name].texture;
     }
     else
     {
         //using default texture for resource
-		return defaultTexture;
+        return defaultTexture;
     }
 }
+
+///// Animation struct functions /////
 
 ResourceManager::Animations::Animations() 
 {
@@ -392,7 +410,7 @@ const std::map<std::string, std::vector<sf::IntRect>>& ResourceManager::getAnima
     else
     {
         //using default animations for resource
-		return defaultAnimations;
+        return defaultAnimations;
     }
 }
 
@@ -425,6 +443,6 @@ const std::map<std::string, sf::IntRect>& ResourceManager::getFrames(const std::
     else
     {
         //using default frames for resource
-		return defaultFrames;
+        return defaultFrames;
     }
 }
