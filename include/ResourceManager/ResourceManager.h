@@ -44,17 +44,19 @@ private:
     std::queue<std::vector<std::string>> instructions;
     std::vector<std::string> split(const std::string& line);
 
-    void establish(Type type, const std::string& name, std::string& error);
+    void establish(const std::string& name, Type type, std::string& error);
     void source(const std::string& fileName, std::string& error);
     void dimension(const std::string& name, int width, int height,
                    std::string& error);
     void texture(const std::string& name, const std::string& file,
                  const std::string& filtering, std::string& error);
     void newAnimation(const std::string& resourceName,
-                      const std::string& animationName, int, int, 
-                      bool isVertical, int, std::string& error);
+                      const std::string& animationName, int x, int y, 
+                      const std::string& isVertical, int frameCount,
+                      std::string& error);
     void newFrame(const std::string& resourceName,
-                  const std::string& frameName, int, int, std::string& error);
+                  const std::string& frameName, int x, int y, 
+                  std::string& error);
     
     struct Texture
     {

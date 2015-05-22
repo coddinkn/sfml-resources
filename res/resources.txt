@@ -1,10 +1,21 @@
-create test animated sprite 
-texture test testAnimatedSprite.png
+establish test animated
+texture test testAnimatedSprite.png rough
 dimension test 64 64  
-add test animation testAnimation 0 0 h 3 
-add test animation testAnimation2 0 0 v 3
+add-animation test testAnimation 0 0 h 3 
+add-animation test testAnimation2 0 0 v 3
 
-create hello sprite sheet
-texture hello testAnimatedSprite.png
+establish hello sheet
+texture hello testAnimatedSprite.png rough
 dimension hello 64 64
-add hello frame first 64 0
+add-frame hello first 64 0
+
+# Error testing
+#garbage take it out
+#establish test animated
+#establish new dog
+#establish cool animated sprite
+#texture test testAnimatedSprite.png beautiful
+#texture wrong car.txt rough
+#source nonexistant.txt
+#add-frame test first 64 0
+#add-animation hello second 0 0 h 3

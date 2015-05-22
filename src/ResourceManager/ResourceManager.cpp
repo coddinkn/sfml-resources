@@ -54,8 +54,13 @@ ResourceManager::ResourceManager(const std::string& resourceFilePath)
             switch (command)
             {
                 case Command::ADD_ANIMATION:
+                    newAnimation(current[1], current[2], std::stoi(current[3]),
+                                 std::stoi(current[4]), current[5],
+                                 std::stoi(current[6]), error);
                     break;
                 case Command::ADD_FRAME:
+                    newFrame(current[1], current[2], std::stoi(current[3]),
+                             std::stoi(current[4]), error);
                     break;
                 case Command::COMMENT:
                     break;
@@ -64,7 +69,7 @@ ResourceManager::ResourceManager(const std::string& resourceFilePath)
                               std::stoi(current[3]), error);
                     break;
                 case Command::ESTABLISH:
-                    establish(parseType(current[1]), current[2], error);
+                    establish(current[1], parseType(current[2]), error);
                     break;
                 case Command::SOURCE:
                     source(current[1], error);
@@ -100,9 +105,11 @@ ResourceManager::ResourceManager(const std::string& resourceFilePath)
     }
 }
 
+///// Command processing /////
+
 /// Registers a new resource with the management system
-void ResourceManager::establish(ResourceManager::Type type, 
-                                const std::string& name, std::string& error)
+void ResourceManager::establish(const std::string& name,
+                                ResourceManager::Type type, std::string& error)
 {
     if (resources.find(name) != resources.end())
     {
@@ -184,61 +191,65 @@ void ResourceManager::texture(const std::string& name, const std::string& file,
     }
 }
 
+/// Adds a new animation to a given animated sprite
 void ResourceManager::newAnimation(const std::string& resourceName,
                                    const std::string& animationName, int x,
-                                   int y, bool isVertical, int frameCount,
-                                   std::string& error)
+                                   int y, const std::string& isVertical, 
+                                   int frameCount, std::string& error)
 {
-    // TODO implement
+    if (resources.find(resourceName) == resources.end())
+    {
+        error = "The resource \"" + resourceName + "\" does not exist";
+    }
+    else if (resources[resourceName] != Type::ANIMATED)
+    {
+        error = "\"" + resourceName + "\" is not an animated sprite";
+    }
+    else if (setOfAnimations[resourceName].animations.find(animationName)
+        != setOfAnimations[resourceName].animations.end())
+    {
+        error = "The animation \"" + animationName
+                + "\" is alread present in the group \"" + resourceName + "\"";
+    }
+    else if (isVertical != "h" && isVertical != "v")
+    {
+        error = "Unrecognized direction flag \"" + isVertical + "\"";
+    }
+    else
+    {
+        bool vertical = false;
+        if (isVertical == "v")
+            vertical = true;
+
+        setOfAnimations[resourceName].addAnimation(animationName, x, y,
+                                                   vertical, frameCount);
+    }
 }
 
+/// Adds a new frame to a given sprite sheet
 void ResourceManager::newFrame(const std::string& resourceName,
                                const std::string& frameName, int x, int y,
                                std::string& error)
 {
-    // TODO implement
-}
-
-/*
-bool ResourceManager::add(std::string* arg_start, std::string* arg_end)
-{
-    if (resources.find(*arg_start) == resources.end())
+    if (resources.find(resourceName) == resources.end())
     {
-        //resource not yet created or improper number of arguments
-        return false;
+        error = "The resource \"" + resourceName + "\" does not exist";
     }
-    else if((*(arg_start + 1))[0] == 'a' && resources[*arg_start] == Type::ANIMATED)
+    else if (resources[resourceName] != Type::SHEET)
     {
-        if((arg_start + 6) < arg_end)
-        {
-            setOfAnimations[*arg_start].addAnimation(*(arg_start + 2), std::stoi(*(arg_start + 3)), std::stoi(*(arg_start + 4)), ((*(arg_start + 5))[0] == 'v'), std::stoi(*(arg_start + 6)));
-            return true;
-        }
-        else
-        {
-            //invalid number of arguments
-            return false;
-        }
+        error = "\"" + resourceName + "\" is not a sprite sheet";
     }
-    else if((*(arg_start + 1))[0] == 'f' && resources[*arg_start] == Type::SHEET)
+    else if (setOfFrames[resourceName].frames.find(frameName)
+        != setOfFrames[resourceName].frames.end())
     {
-        if((arg_start + 4) < arg_end)
-        {
-            setOfFrames[*arg_start].addFrame(*(arg_start + 2), std::stoi(*(arg_start + 3)), std::stoi(*(arg_start + 4)));
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        error = "The frame \"" + frameName
+                + "\" is alread present in the group \"" + resourceName + "\"";
     }
-    else
+    else // Non-error case
     {
-        //resource of imporper type to add specified parameter or not defined
-        return false;
+        setOfFrames[resourceName].addFrame(frameName, x, y);
     }
 }
-*/
 
 ///// Parsing functions /////
 
@@ -260,9 +271,9 @@ void ResourceManager::initializeKeywords()
     elementMap["animation"];
     elementMap["frame"];
 
-    argumentNumbers[Command::ADD_ANIMATION] = 8;
-    argumentNumbers[Command::ADD_FRAME] = 6;
-    argumentNumbers[Command::ESTABLISH] = 4;
+    argumentNumbers[Command::ADD_ANIMATION] = 7;
+    argumentNumbers[Command::ADD_FRAME] = 5;
+    argumentNumbers[Command::ESTABLISH] = 3;
     argumentNumbers[Command::DIMENSION] = 4;
     argumentNumbers[Command::SOURCE] = 2;
     argumentNumbers[Command::TEXTURE] = 4;
@@ -292,18 +303,6 @@ ResourceManager::Type ResourceManager::parseType(std::string type)
         return Type::INVALID_TYPE;
     else
         return matchedType->second;
-}
-
-ResourceManager::Element ResourceManager::parseElement(const std::string& element)
-{
-    // Search for the element within the appropriate keyword map
-    auto matchedElement = elementMap.find(element);
-
-    // If the search fails, return INVALID. Otherwise, return what was found
-    if (matchedElement == elementMap.end())
-        return Element::INVALID_ELEMENT;
-    else
-        return matchedElement->second;
 }
 
 // Verifies whether the number of arguments is correct for a given command
@@ -364,7 +363,7 @@ const sf::Texture& ResourceManager::getTexture(const std::string& name)
     }
 }
 
-///// Animation struct functions /////
+///// Animations struct functions /////
 
 ResourceManager::Animations::Animations() 
 {
@@ -413,6 +412,8 @@ const std::map<std::string, std::vector<sf::IntRect>>& ResourceManager::getAnima
         return defaultAnimations;
     }
 }
+
+///// Frames struct functions /////
 
 ResourceManager::Frames::Frames()
 {
