@@ -37,8 +37,11 @@ ResourceManager::ResourceManager(const std::string& resourceFilePath)
     // Read in each instruction from the resource file
     std::string line;
     while (std::getline(file, line))
-        if (line != "" && line != " " && line != "\n")
-            instructions.push(split(line));
+    {
+        std::vector<std::string> arguments = split(line);
+        if (arguments.size() > 0) // Ignore empty/whitespace-only lines
+            instructions.push(arguments);
+    }
 
     // Parse and process each command
     int lineNumber = 1;
@@ -256,9 +259,9 @@ void ResourceManager::newFrame(const std::string& resourceName,
 /// Initializes the text keywords associated with each type and command
 void ResourceManager::initializeKeywords()
 {
+    // Note: the "Comment" command is handled in parseCommand as a special case
     commandMap["add-animation"] = Command::ADD_ANIMATION;
     commandMap["add-frame"] = Command::ADD_FRAME;
-    commandMap["#"] = Command::COMMENT;
     commandMap["establish"] = Command::ESTABLISH;
     commandMap["dimension"] = Command::DIMENSION;
     commandMap["source"] = Command::SOURCE;
@@ -285,9 +288,15 @@ ResourceManager::Command ResourceManager::parseCommand(std::string command)
     // Search for the command within the map
     auto matchedCommand = commandMap.find(command);
 
-    // If the search fails, return INVALID. Otherwise, return what was found
+    // If the search fails, check if the line is a comment. Otherwise, return
+    // INVALID. If the search succeeds, return the associated command
     if (matchedCommand == commandMap.end())
-        return Command::INVALID_COMMAND;
+    {
+        if (command[0] == '#')
+            return Command::COMMENT;
+        else
+            return Command::INVALID_COMMAND;
+    }
     else
         return matchedCommand->second;
 }
