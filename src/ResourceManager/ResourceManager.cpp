@@ -170,6 +170,7 @@ void ResourceManager::dimension(const std::string& name, int width, int height,
     }
 }
 
+/// Links a texture file to a given resource
 void ResourceManager::texture(const std::string& name, const std::string& file,
                               const std::string& filtering, std::string& error)
 {
@@ -314,7 +315,7 @@ ResourceManager::Type ResourceManager::parseType(std::string type)
         return matchedType->second;
 }
 
-// Verifies whether the number of arguments is correct for a given command
+/// Verifies whether the number of arguments is correct for a given command
 bool ResourceManager::checkArgumentNumber(Command command, int number)
 {
     // Search for the number within the argument length map
@@ -333,6 +334,7 @@ bool ResourceManager::checkArgumentNumber(Command command, int number)
     }
 }
 
+/// Separates the words within a line, removing all whitespace
 std::vector<std::string> ResourceManager::split(const std::string& line)
 {
     // A stringstream will read in separate words and discard whitespace
@@ -349,25 +351,29 @@ std::vector<std::string> ResourceManager::split(const std::string& line)
 
 ResourceManager::Texture::Texture() {}
 
-void ResourceManager::Texture::setFileName(const std::string& file_name)
+/// Associates a texture with a given file name
+void ResourceManager::Texture::setFileName(const std::string& fileName)
 {
-        this->file_name = file_name;   
+    this->fileName = fileName;
 }
 
+/// Loads in and initializes the texture from a previously provided file name.
+/// Returns true if successful
 bool ResourceManager::Texture::load()
 {
     return (loaded = texture.loadFromFile(file_name));
 }
 
+/// Retrieves the sf::Texture associated with a given resource name
 const sf::Texture& ResourceManager::getTexture(const std::string& name)
 {
+    // Attempts to retrieve or load the texture (if not yet loaded)
     if (textures[name].loaded || textures[name].load())
     {
         return textures[name].texture;
     }
-    else
+    else // Use the default texture if the request can't be completed
     {
-        //using default texture for resource
         return defaultTexture;
     }
 }
@@ -417,7 +423,6 @@ const std::map<std::string, std::vector<sf::IntRect>>& ResourceManager::getAnima
     }
     else
     {
-        //using default animations for resource
         return defaultAnimations;
     }
 }
