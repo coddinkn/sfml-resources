@@ -361,7 +361,7 @@ void ResourceManager::Texture::setFileName(const std::string& fileName)
 /// Returns true if successful
 bool ResourceManager::Texture::load()
 {
-    return (loaded = texture.loadFromFile(file_name));
+    return (loaded = texture.loadFromFile(fileName));
 }
 
 /// Retrieves the sf::Texture associated with a given resource name

@@ -10,7 +10,7 @@
 class ResourceManager
 {
 public:
-	ResourceManager(const std::string& res_parentDirectoryPath);
+	ResourceManager(const std::string& resourceFilePath);
 	const sf::Texture& getTexture(const std::string& name);
 	const std::map<std::string, sf::IntRect>& getFrames(const std::string& name);
 	const std::map<std::string, std::vector<sf::IntRect>>& getAnimations(const std::string& name);
@@ -63,8 +63,8 @@ private:
         Texture();
         bool loaded = false;
 		bool load();
-        std::string file_name;
-        void setFileName(const std::string& file_name);
+        std::string fileName;
+        void setFileName(const std::string& fileName);
         sf::Texture texture;   
     };
 
@@ -75,7 +75,7 @@ private:
         int height;
         bool dimensioned = false;
         void setDimensions(int width, int height);
-        void addFrame(const std::string& frame_name, int x, int y);
+        void addFrame(const std::string& frameName, int x, int y);
         std::map<std::string, sf::IntRect> frames;
     };
 
@@ -86,7 +86,7 @@ private:
         int height;
         bool dimensioned = false;
         void setDimensions(int width, int height);
-        void addAnimation(const std::string& animation_name, int x, int y, bool isVertical, int frames);
+        void addAnimation(const std::string& animationName, int x, int y, bool isVertical, int frames);
         std::map<std::string, std::vector<sf::IntRect>> animations; 
     };
 
