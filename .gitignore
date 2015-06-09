@@ -1,5 +1,6 @@
 build/**
 sfml-res-man-test
+libsfml-res-man.a
 .sconsign.dblite
 **/*.swp
 **/*.swo

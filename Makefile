@@ -8,9 +8,12 @@ vpath %.o ./build
 vpath %.h ./include:./include/ResourceManager
 vpath %.cpp ./src:./src/ResourceManager
 
-all: sfml-res-man-test
+all: libsfml-res-man.a sfml-res-man-test
 
 .PHONY: clean
+
+libsfml-res-man.a: ResourceManager.o AnimatedSprite.o ManagedSprite.o
+	ar rvs $@ $^
 
 sfml-res-man-test: main.cpp ResourceManager.o AnimatedSprite.o ManagedSprite.o
 	$(CXX) $^ $(CXXFLAGS) $(LIBS) $(INCLUDES) -o $@
@@ -22,4 +25,4 @@ sfml-res-man-test: main.cpp ResourceManager.o AnimatedSprite.o ManagedSprite.o
 	cp $@ ./build
 
 clean:
-	rm -f sfml-res-man-test ./build/*.o
+	rm -f libsfml-res-man.a sfml-res-man-test ./build/*.o
