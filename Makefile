@@ -18,4 +18,4 @@ sfml-res-man-test: main.cpp ResourceManager.o AnimatedSprite.o ManagedSprite.o
 	$(CXX) -c $< $(CXXFLAGS) $(LIBS) $(INCLUDES)
 
 clean:
-	rm sfml-res-man-test *.o
+	rm -f sfml-res-man-test *.o
