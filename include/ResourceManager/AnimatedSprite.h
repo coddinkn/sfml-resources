@@ -25,7 +25,7 @@ class AnimatedSprite : public sf::Sprite
     private:        
         std::map<std::string, std::vector<sf::IntRect>> animations;
         std::string currentAnimation;
-        int currentFrame = 0;
+        unsigned currentFrame = 0;
         int frameTime;   
         int elapsedTime = 0;
         bool paused = false;

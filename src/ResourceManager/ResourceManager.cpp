@@ -96,7 +96,7 @@ ResourceManager::ResourceManager(const std::string& resourceFilePath)
         {
             std::cerr << "(ResourceManager) " << error << ':' << std::endl;
             std::cerr << "\t[" << lineNumber << "]:";
-            for (int i = 0; i < current.size(); ++i)
+            for (unsigned i = 0; i < current.size(); ++i)
                 std::cerr << ' ' << current[i];
             std::cerr << std::endl;
         }
