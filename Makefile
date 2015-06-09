@@ -1,11 +1,12 @@
 CXX=g++
 CXXFLAGS = -Wall -std=c++11
 
-INCLUDES = -Iinclude -Iinclude/ResourceManager
+INCLUDES = -I./include -I./include/ResourceManager
 LIBS = -lsfml-graphics -lsfml-window -lsfml-system
 
-vpath %.h include:include/ResourceManager
-vpath %.cpp src:src/ResourceManager
+vpath %.o ./build
+vpath %.h ./include:./include/ResourceManager
+vpath %.cpp ./src:./src/ResourceManager
 
 all: sfml-res-man-test
 
@@ -13,9 +14,12 @@ all: sfml-res-man-test
 
 sfml-res-man-test: main.cpp ResourceManager.o AnimatedSprite.o ManagedSprite.o
 	$(CXX) $^ $(CXXFLAGS) $(LIBS) $(INCLUDES) -o $@
+	rm -f *.o
 
 %.o: %.cpp %.h
 	$(CXX) -c $< $(CXXFLAGS) $(LIBS) $(INCLUDES)
+	if [ ! -d "./build" ]; then mkdir build; fi	
+	cp $@ ./build
 
 clean:
-	rm sfml-res-man-test *.o
+	rm -f sfml-res-man-test ./build/*.o

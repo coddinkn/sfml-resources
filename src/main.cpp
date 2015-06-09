@@ -16,6 +16,7 @@ int main()
 	window.setFramerateLimit(60);
 
 	test.setPosition(32, 32);
+	hello.setPosition(100, 10);
 
 	time.restart();
 
