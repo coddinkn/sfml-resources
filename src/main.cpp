@@ -2,21 +2,22 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include "ResourceManager.h"
+#include "ManagedSprite.h"
 #include "AnimatedSprite.h"
 
 int main()
 {
-    sf::Clock time;
+	sf::Clock time;
 
-    ResourceManager manager("res/resources.txt");
-    AnimatedSprite test(manager, "test", "testAnimation", 1000, true);
+	ResourceManager manager("res/resources.txt");
+	AnimatedSprite test(manager, "test", "testAnimation", 1000, true);
 	ManagedSprite hello(manager, "hello", "first", false);
 	sf::RenderWindow window(sf::VideoMode(640, 480), "SFML Resource Manager");
 	window.setFramerateLimit(60);
 
 	test.setPosition(32, 32);
 
-    time.restart();
+	time.restart();
 
 	while ( window.isOpen() )
 	{
@@ -26,27 +27,27 @@ int main()
 		while( window.pollEvent( event ) )
 		{
 			if( event.type == sf::Event::Closed )
-            {
-                window.close();
-            }
-		
-            if(event.type == sf::Event::KeyPressed)
-            {
-            	test.rotate(5);
-            	hello.rotate(-5);
+			{
+				window.close();
 			}
-        
-        }
 
-        test.tick(time.getElapsedTime().asMilliseconds());
-        time.restart();
+			if(event.type == sf::Event::KeyPressed)
+			{
+				test.rotate(5);
+				hello.rotate(-5);
+			}
+
+		}
+
+		test.tick(time.getElapsedTime().asMilliseconds());
+		time.restart();
 
 		window.clear();
-        window.draw(test);
+		window.draw(test);
 		window.draw(hello);
-	    window.display();
+		window.display();
 
 	}
 
-   	 return 0;
+	return 0;
 }
