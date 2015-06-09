@@ -1,8 +1,9 @@
 build/**
-SFML\ Resource\ Manager
+sfml-res-man-test
 .sconsign.dblite
 **/*.swp
 **/*.swo
 docs/**
 **/*.exe
 **/*.a
+**/*.o
