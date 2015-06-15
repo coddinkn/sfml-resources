@@ -32,3 +32,23 @@ void ManagedSprite::changeFrame(const std::string& frame)
     else
         setTextureRect(frames["null_frame"]);    
 }
+
+void ManagedSprite::position(float x, float y)
+{
+	setPosition(x, y);
+
+	if(getOrigin().x != 0 && getOrigin().y != 0)
+		move((getTextureRect().width / 2.0), (getTextureRect().height / 2.0));
+}
+
+sf::Vector2f ManagedSprite::position()
+{
+	if(getOrigin().x != 0 && getOrigin().y !=0)	
+	{
+		return sf::Vector2f(getPosition().x + getTextureRect().width, getPosition().y + getTextureRect().height);
+	}
+	else
+	{
+		return this->getPosition();
+	}
+}

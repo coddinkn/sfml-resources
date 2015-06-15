@@ -11,14 +11,16 @@ int main()
 
 	ResourceManager manager("res/resources.txt");
 	AnimatedSprite test(manager, "test", "testAnimation", 1000, true);
-	ManagedSprite hello(manager, "hello", "first", false);
+	ManagedSprite hello(manager, "hello", "first", true);
 	sf::RenderWindow window(sf::VideoMode(640, 480), "SFML Resource Manager");
 	window.setFramerateLimit(60);
 
 	test.setPosition(32, 32);
-	hello.setPosition(100, 10);
+	hello.position(100, 10);
 
 	time.restart();
+
+	if(!manager) return 1; 
 
 	while ( window.isOpen() )
 	{

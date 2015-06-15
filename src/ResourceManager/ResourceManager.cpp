@@ -10,7 +10,7 @@ ResourceManager::ResourceManager(const std::string& resourceFilePath)
 {
     // Initialize the keywords that will be parsed from the resource file
     initializeKeywords();
-
+	
     // Create the default images to be used in response to invalid requests
     sf::Image defaultImage;
     defaultImage.create(64, 64, sf::Color(0xFF, 0x00, 0xFF));
@@ -106,6 +106,9 @@ ResourceManager::ResourceManager(const std::string& resourceFilePath)
         lineNumber++;
         error = "";
     }
+
+	valid = true;
+
 }
 
 ///// Command processing /////
@@ -460,4 +463,9 @@ const std::map<std::string, sf::IntRect>& ResourceManager::getFrames(const std::
         //using default frames for resource
         return defaultFrames;
     }
+}
+
+ResourceManager::operator bool()
+{
+	return valid;
 }
