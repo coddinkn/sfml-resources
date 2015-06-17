@@ -15,8 +15,8 @@ int main()
 	sf::RenderWindow window(sf::VideoMode(640, 480), "SFML Resource Manager");
 	window.setFramerateLimit(60);
 
-	test.setPosition(32, 32);
-	hello.position(100, 10);
+	test.setPosition(0, 0);
+	hello.setPosition(0, 0);
 
 	time.restart();
 

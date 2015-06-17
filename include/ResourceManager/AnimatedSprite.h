@@ -21,7 +21,7 @@ class AnimatedSprite : public sf::Sprite
         void pause();
         bool isPaused();
         void changeFrameTime(int frameTime);
-
+		void setPosition(float x, float y);
     private:        
         std::map<std::string, std::vector<sf::IntRect>> animations;
         std::string currentAnimation;
@@ -29,6 +29,7 @@ class AnimatedSprite : public sf::Sprite
         int frameTime;   
         int elapsedTime = 0;
         bool paused = false;
+		bool centered;
 };
 
 #endif

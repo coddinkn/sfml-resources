@@ -3,7 +3,7 @@
 ManagedSprite::ManagedSprite(ResourceManager& manager,
 const std::string& name,
 const std::string& firstFrame,
-bool isCentered) : sf::Sprite(manager.getTexture(name)), frames(manager.getFrames(name))
+bool isCentered) : sf::Sprite(manager.getTexture(name)), frames(manager.getFrames(name)), centered(isCentered)
 {
     frames["null_frame"].width = getTexture()->getSize().x;
 	frames["null_frame"].height = getTexture()->getSize().y;
@@ -15,7 +15,7 @@ bool isCentered) : sf::Sprite(manager.getTexture(name)), frames(manager.getFrame
 
 ManagedSprite::ManagedSprite(ResourceManager& manager,
 const std::string& name,
-bool isCentered) : sf::Sprite(manager.getTexture(name)), frames(manager.getFrames(name))
+bool isCentered) : sf::Sprite(manager.getTexture(name)), frames(manager.getFrames(name)), centered(isCentered)
 {
     frames["null_frame"].width = getTexture()->getSize().x;
 	frames["null_frame"].height = getTexture()->getSize().y;
@@ -33,22 +33,10 @@ void ManagedSprite::changeFrame(const std::string& frame)
         setTextureRect(frames["null_frame"]);    
 }
 
-void ManagedSprite::position(float x, float y)
+void ManagedSprite::setPosition(float x, float y)
 {
-	setPosition(x, y);
+	sf::Sprite::setPosition(x, y);
 
-	if(getOrigin().x != 0 && getOrigin().y != 0)
+	if(centered)
 		move((getTextureRect().width / 2.0), (getTextureRect().height / 2.0));
-}
-
-sf::Vector2f ManagedSprite::position()
-{
-	if(getOrigin().x != 0 && getOrigin().y !=0)	
-	{
-		return sf::Vector2f(getPosition().x + getTextureRect().width, getPosition().y + getTextureRect().height);
-	}
-	else
-	{
-		return this->getPosition();
-	}
 }
