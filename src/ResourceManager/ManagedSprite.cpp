@@ -3,7 +3,7 @@
 ManagedSprite::ManagedSprite(ResourceManager& manager,
 const std::string& name,
 const std::string& firstFrame,
-bool isCentered) : sf::Sprite(manager.getTexture(name)), frames(manager.getFrames(name)), centered(isCentered)
+bool isCentered) : sf::Sprite(manager.getTexture(name)), centered(isCentered), frames(manager.getFrames(name))
 {
     frames["null_frame"].width = getTexture()->getSize().x;
 	frames["null_frame"].height = getTexture()->getSize().y;
@@ -15,7 +15,7 @@ bool isCentered) : sf::Sprite(manager.getTexture(name)), frames(manager.getFrame
 
 ManagedSprite::ManagedSprite(ResourceManager& manager,
 const std::string& name,
-bool isCentered) : sf::Sprite(manager.getTexture(name)), frames(manager.getFrames(name)), centered(isCentered)
+bool isCentered) : sf::Sprite(manager.getTexture(name)), centered(isCentered), frames(manager.getFrames(name))
 {
     frames["null_frame"].width = getTexture()->getSize().x;
 	frames["null_frame"].height = getTexture()->getSize().y;
