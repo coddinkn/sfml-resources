@@ -32,11 +32,3 @@ void ManagedSprite::changeFrame(const std::string& frame)
     else
         setTextureRect(frames["null_frame"]);    
 }
-
-void ManagedSprite::setPosition(float x, float y)
-{
-	sf::Sprite::setPosition(x, y);
-
-	if(centered)
-		move((getTextureRect().width / 2.0), (getTextureRect().height / 2.0));
-}

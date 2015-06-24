@@ -40,16 +40,15 @@ int main()
 
 		window.clear();
 		
-		for(int i = 0; i < 7; i++)
+		for(int i = 0; i < 4; i++)
 		{
-			for(int j = 0; j < 10; j++)
+			for(int j = 0; j < 4; j++)
 			{
 				track.setPosition(64 * i, 64 * j);
 				if(j % 2 == 0) 
 				{
-					track.setRotation(180);
+					track.setRotation(90 * i);
 					window.draw(track);
-					track.setRotation(0);
 				}
 				else
 				{

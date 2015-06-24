@@ -70,12 +70,3 @@ void AnimatedSprite::changeFrameTime(int frameTime)
 {
     this->frameTime = frameTime;
 }
-
-void AnimatedSprite::setPosition(float x, float y)
-{
-	sf::Sprite::setPosition(x, y);
-
-	if(centered)
-		move(getTextureRect().width / 2.0, getTextureRect().height / 2.0);		
-
-}
