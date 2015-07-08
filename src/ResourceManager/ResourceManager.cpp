@@ -44,6 +44,35 @@ ResourceManager::ResourceManager(const std::string& resourceFilePath)
 	}
 	file.close();
 
+	for (auto i = instructions.begin(); i != instructions.end(); i++)
+	{
+		for (auto j = i->begin(); j != i->end(); j++)
+		{
+			if (j->find('#') != std::string::npos)
+			{
+				if(j != i->begin())
+				{
+					i->erase(j, i->end());
+				}
+				else
+				{
+					instructions.erase(i);
+					i--;
+				}
+				break;
+			}
+		}
+	}
+
+	for (auto i = instructions.begin(); i != instructions.end(); i++)
+	{
+		for(auto j = i->begin(); j != i->end(); j++)
+		{
+			std::cout << *j << " ";
+		}
+		std::cout << std::endl;
+	}
+
 	// Parse and process each command
 	int lineNumber = 1;
 	std::string error = "";
@@ -333,8 +362,6 @@ bool ResourceManager::checkScope(Command command, bool in_block)
 		case Command::TEXTURE:
 			return in_block;
 		default:
-			//this should seriously never ever happen
-			std::cerr << "[ResourceManager]: fatal error" << std::endl;
 			return false;
 	}
 }
