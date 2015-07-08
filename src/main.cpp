@@ -44,7 +44,7 @@ int main()
 		{
 			for(int j = 0; j < 4; j++)
 			{
-				track.setPosition(64 * i, 64 * j);
+				track.setPosition((64 * i) + 32, (64 * j) + 32);
 				if(j % 2 == 0) 
 				{
 					track.setRotation(90 * i);

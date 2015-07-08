@@ -3,7 +3,6 @@
 
 #include <string>
 #include <vector>
-#include <queue>
 #include <map>
 #include <SFML/Graphics.hpp>
 
@@ -19,12 +18,12 @@ public:
 private:
     enum Command
     {
-        ADD_ANIMATION, ADD_FRAME, COMMENT, DIMENSION, SOURCE,
-        TEXTURE, INVALID_COMMAND, START_BLOCK, END_BLOCK, TYPE
+        ADD_ANIMATION, ADD_FRAME, DIMENSION, SOURCE, TEXTURE,
+        INVALID_COMMAND, START_BLOCK, END_BLOCK, DEFINE
     };
     enum Type { ANIMATED, SHEET, SPRITE, INVALID_TYPE }; 
-    enum Element { ANIMATION, FRAME, INVALID_ELEMENT };
 
+	std::string parentDirectoryPath;
     void initializeKeywords(); 
 
     std::map<std::string, Command> commandMap;
@@ -37,17 +36,15 @@ private:
 	bool checkScope(Command, bool inside_block);   
  
     std::map<std::string, Type> resources;
-    std::string parentDirectoryPath;
-    bool valid;
+    bool valid = true;
 
-    std::vector<std::vector<std::string>> instructions;
     std::vector<std::string> split(const std::string& line);
 
-    void source(const std::vector<std::string>& arguments, std::string& error);
-    void dimension(const std::string& resourceName, const std::vector<std::string>& arguments, std::string& error);
+	void define_resource(const std::string& resourceName, Type type, std::string& error);
+    void dimension(const std::string& resourceName, int width, int height, std::string& error);
     void texture(const std::string& resourceName, const std::vector<std::string>& arguments, std::string& error);
-    void newAnimation(const std::string& resourceName, const std::vector<std::string>& arguments, std::string& error);
-    void newFrame(const std::string& resourceName, const std::vector<std::string>& arguments, std::string& error);   
+    void newAnimation(const std::string& resourceName, const std::string& animation_name, int x, int y, int number_of_frames, const std::string& direction, std::string& error);
+    void newFrame(const std::string& resourceName, const std::string& frame_name, int x, int y, std::string& error);   
  
     struct Texture
     {
