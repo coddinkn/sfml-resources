@@ -8,3 +8,4 @@ docs/**
 **/*.exe
 **/*.a
 **/*.o
+error
