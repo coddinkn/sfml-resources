@@ -1,11 +1,16 @@
+# track resource, actually used in foth
 sheet track
-# test 1
-
-#test2
-#test 3
 {
-dimension 64 64
-texture track.png smooth
-add-frame straight 0 0 #test
-add-frame turn 64 0 # this is a test
+	dimension 64 64
+	texture track.png smooth
+	add-frame straight 0 0
+	add-frame turn 64 0
+}
+
+# just a test animation
+animated test
+{
+	dimension 64 64
+	texture testAnimatedSprite.png
+	add-animation first 0 0 3 h
 }

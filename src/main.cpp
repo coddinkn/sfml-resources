@@ -13,8 +13,11 @@ int main()
 	ManagedSprite track(manager, "track", "turn", true);
 	sf::RenderWindow window(sf::VideoMode(448, 640), "FLOAT");
 	window.setFramerateLimit(60);
+	AnimatedSprite test(manager, "test", "first", 100, true);
 	
 	time.restart();
+
+	test.setPosition(33, 33);
 
 	if(!manager) return 1; 
 
@@ -32,10 +35,12 @@ int main()
 
 			if(event.type == sf::Event::KeyPressed)
 			{
+				track.changeFrame("straight");
 			}
 
 		}
 
+		test.tick(time.getElapsedTime().asMilliseconds());
 		time.restart();
 
 		window.clear();
@@ -56,6 +61,7 @@ int main()
 				}
 			}
 		}
+		window.draw(test);
 		window.display();
 
 	}
