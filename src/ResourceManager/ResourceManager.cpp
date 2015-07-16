@@ -64,15 +64,6 @@ ResourceManager::ResourceManager(const std::string& resourceFilePath)
 		}
 	}
 
-	for (auto i = instructions.begin(); i != instructions.end(); i++)
-	{
-		for(auto j = i->begin(); j != i->end(); j++)
-		{
-			std::cout << *j << " ";
-		}
-		std::cout << std::endl;
-	}
-
 	// Parse and process each command
 	int lineNumber = 1;
 	std::string error = "";
@@ -117,6 +108,25 @@ ResourceManager::ResourceManager(const std::string& resourceFilePath)
 					{
 						while (std::getline(file, line))
 							instructions.push_back(split(line));    
+					}
+					for (auto i = instructions.begin(); i != instructions.end(); i++)
+					{
+						for (auto j = i->begin(); j != i->end(); j++)
+						{
+							if (j->find('#') != std::string::npos)
+							{
+								if(j != i->begin())
+								{
+									i->erase(j, i->end());
+								}
+								else
+								{
+									instructions.erase(i);
+									i--;
+								}
+								break;
+							}
+						}
 					}
 					file.close();
 					break;
