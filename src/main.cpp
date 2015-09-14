@@ -2,7 +2,7 @@
 #include <SFML/System.hpp>
 #include <SFML/Graphics.hpp>
 #include "ResourceManager.h"
-#include "ManagedSprite.h"
+#include "SpriteSheet.h"
 #include "AnimatedSprite.h"
 
 int main()
@@ -10,14 +10,16 @@ int main()
 	sf::Clock time;
 
 	ResourceManager manager("res/resources.txt");
-	ManagedSprite track(manager, "track", "turn", true);
+	SpriteSheet track = manager("track", "turn", true);
 	sf::RenderWindow window(sf::VideoMode(448, 640), "FLOAT");
 	window.setFramerateLimit(60);
-	AnimatedSprite test(manager, "test", "first", 100, true);
-	
+	AnimatedSprite test = manager("test", "first", 100, true);
+	sf::Sprite test2 = manager("track", true);
+
 	time.restart();
 
 	test.setPosition(33, 33);
+	test2.setPosition(20, 100);
 
 	if(!manager) return 1; 
 
@@ -36,6 +38,7 @@ int main()
 			if(event.type == sf::Event::KeyPressed)
 			{
 				track.changeFrame("straight");
+				test2.rotate(5.0);
 			}
 
 		}
@@ -61,6 +64,7 @@ int main()
 				}
 			}
 		}
+		window.draw(test2);
 		window.draw(test);
 		window.display();
 

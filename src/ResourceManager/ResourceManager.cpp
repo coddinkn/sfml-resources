@@ -6,6 +6,9 @@
 #include <fstream>
 #include <sstream>
 
+#include <SpriteSheet.h>
+#include <AnimatedSprite.h>
+
 ResourceManager::ResourceManager(const std::string& resourceFilePath)
 {
 	// Initialize the keywords that will be parsed from the resource file
@@ -508,4 +511,27 @@ const std::map<std::string, sf::IntRect>& ResourceManager::getFrames(const std::
 ResourceManager::operator bool()
 {
 	return valid;
+}
+
+///// Resource Creation methods /////
+
+sf::Sprite ResourceManager::operator()(std::string resource_name, bool centered)
+{
+	sf::Sprite sprite(getTexture(resource_name));
+	if(centered) sprite.setOrigin(float(sprite.getTextureRect().width / 2.0), float(sprite.getTextureRect().height / 2.0));
+	return sprite;
+}
+
+
+//sprite sheet
+SpriteSheet ResourceManager::operator()(std::string resource_name, std::string first_frame, bool centered)
+{
+	return SpriteSheet(*this, resource_name, first_frame, centered);
+}
+
+
+//animated sprite
+AnimatedSprite ResourceManager::operator()(std::string resource_name, std::string first_frame, int tick_time, bool centered)
+{
+	return AnimatedSprite(*this, resource_name, first_frame, tick_time, centered);
 }

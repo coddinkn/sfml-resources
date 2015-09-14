@@ -6,7 +6,6 @@
 #include <vector>
 #include <SFML/Graphics.hpp>
 #include "ResourceManager.h"
-#include "ManagedSprite.h"
 
 class AnimatedSprite : public sf::Sprite 
 {

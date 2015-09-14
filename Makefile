@@ -12,10 +12,10 @@ all: build libsfml-res-man.a sfml-res-man-test tidy
 
 .PHONY: build clean tidy
 
-libsfml-res-man.a: ResourceManager.o AnimatedSprite.o ManagedSprite.o
+libsfml-res-man.a: ResourceManager.o AnimatedSprite.o SpriteSheet.o
 	ar rvs $@ $^
 
-sfml-res-man-test: main.cpp ResourceManager.o AnimatedSprite.o ManagedSprite.o
+sfml-res-man-test: main.cpp ResourceManager.o AnimatedSprite.o SpriteSheet.o
 	$(CXX) $^ $(CXXFLAGS) $(LIBS) $(INCLUDES) -o $@
 
 %.o: %.cpp %.h
