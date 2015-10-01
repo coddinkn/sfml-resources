@@ -10,11 +10,11 @@ int main()
 	sf::Clock time;
 
 	ResourceManager manager("res/resources.txt");
-	SpriteSheet track = manager("track", "turn", true);
+	SpriteSheet track = manager.newSheet("track", "turn", true);
 	sf::RenderWindow window(sf::VideoMode(448, 640), "FLOAT");
 	window.setFramerateLimit(60);
-	AnimatedSprite test = manager("test", "first", 100, true);
-	sf::Sprite test2 = manager("track", true);
+	AnimatedSprite test = manager.newAnimated("test", "first", 100, true);
+	sf::Sprite test2 = manager.newSprite("track", true);
 
 	time.restart();
 
