@@ -17,9 +17,9 @@ public:
 	const std::map<std::string, sf::IntRect>& getFrames(const std::string& name);
 	const std::map<std::string, std::vector<sf::IntRect>>& getAnimations(const std::string& name);
 	operator bool();
-	SpriteSheet operator()(std::string resource_name, std::string first_frame, bool centered);
-	AnimatedSprite operator()(std::string resource_name, std::string first_frame, int tick_time, bool centered);
-	sf::Sprite operator()(std::string resource_name, bool centered);
+	SpriteSheet newSheet(std::string resource_name, std::string first_frame, bool centered);
+	AnimatedSprite newAnimated(std::string resource_name, std::string first_frame, int tick_time, bool centered);
+	sf::Sprite newSprite(std::string resource_name, bool centered);
 
 private:
     enum Command

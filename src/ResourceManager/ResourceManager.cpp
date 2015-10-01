@@ -515,7 +515,7 @@ ResourceManager::operator bool()
 
 ///// Resource Creation methods /////
 
-sf::Sprite ResourceManager::operator()(std::string resource_name, bool centered)
+sf::Sprite ResourceManager::newSprite(std::string resource_name, bool centered)
 {
 	sf::Sprite sprite(getTexture(resource_name));
 	if(centered) sprite.setOrigin(float(sprite.getTextureRect().width / 2.0), float(sprite.getTextureRect().height / 2.0));
@@ -524,14 +524,14 @@ sf::Sprite ResourceManager::operator()(std::string resource_name, bool centered)
 
 
 //sprite sheet
-SpriteSheet ResourceManager::operator()(std::string resource_name, std::string first_frame, bool centered)
+SpriteSheet ResourceManager::newSheet(std::string resource_name, std::string first_frame, bool centered)
 {
 	return SpriteSheet(*this, resource_name, first_frame, centered);
 }
 
 
 //animated sprite
-AnimatedSprite ResourceManager::operator()(std::string resource_name, std::string first_frame, int tick_time, bool centered)
+AnimatedSprite ResourceManager::newAnimated(std::string resource_name, std::string first_frame, int tick_time, bool centered)
 {
 	return AnimatedSprite(*this, resource_name, first_frame, tick_time, centered);
 }
